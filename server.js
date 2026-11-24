@@ -18,6 +18,7 @@ function sendJson(res, statusCode, data) {
   setCors(res);
   res.writeHead(statusCode, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(data));
+  return true;
 }
 
 function parseJsonBody(req) {
@@ -95,14 +96,17 @@ const server = http.createServer(async (req, res) => {
      ======================================================================== */
   if (pathname.startsWith('/api/auth')) {
     if (handleAuthRoutes(req, res, pathname, body, sendJson)) return;
+    return sendJson(res, 404, { error: 'Auth endpoint not found' });
   }
 
   if (pathname.startsWith('/api/library') || pathname.startsWith('/api/items')) {
     if (handleLibraryRoutes(req, res, pathname, body, sendJson)) return;
+    return sendJson(res, 404, { error: 'Library endpoint not found' });
   }
 
   if (pathname.startsWith('/api/suggestions')) {
     if (handleSuggestionRoutes(req, res, pathname, body, sendJson)) return;
+    return sendJson(res, 404, { error: 'Suggestion endpoint not found' });
   }
 
   /* ========================================================================

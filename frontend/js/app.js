@@ -18,6 +18,7 @@ let heroTimer;
 let filter = { t: "all", g: "all", authorOnly: false };
 let view = "home";
 let list = store.get("ronin_favs", {});
+let st;
 
 const CHIPS = [
   ["all", "All"],
@@ -34,21 +35,46 @@ const CHIPS = [
   ["Cosmic", "Cosmic"]
 ];
 
-/* Fetch Library from Backend */
+function populateDb(items) {
+  db = {};
+  items.forEach(it => {
+    db[it.type + ":" + it.id] = it;
+  });
+  if (items && items.length) {
+    store.set('ronin_vault_cache', items);
+  }
+}
+
+/* Fetch Library from Backend with Static/Offline Fallbacks */
 async function fetchLibrary() {
+  // 1. Try live backend REST API
   try {
     const res = await fetch('/api/library');
     if (res.ok) {
       vaultLibrary = await res.json();
-      db = {};
-      vaultLibrary.forEach(it => {
-        db[it.type + ":" + it.id] = it;
-      });
+      populateDb(vaultLibrary);
       return vaultLibrary;
     }
-  } catch (err) {
-    console.warn("Could not reach backend /api/library", err);
+  } catch {}
+
+  // 2. Try static JSON asset (for GitHub Pages & static hosting)
+  try {
+    const staticRes = await fetch('data/library.json');
+    if (staticRes.ok) {
+      vaultLibrary = await staticRes.json();
+      populateDb(vaultLibrary);
+      return vaultLibrary;
+    }
+  } catch {}
+
+  // 3. Try cached vault from localStorage
+  const cached = store.get('ronin_vault_cache', null);
+  if (Array.isArray(cached) && cached.length) {
+    vaultLibrary = cached;
+    populateDb(vaultLibrary);
+    return vaultLibrary;
   }
+
   return [];
 }
 
@@ -222,12 +248,15 @@ function home() {
 function showGrid(items, title, empty) {
   clearInterval(heroTimer);
   view = "grid";
-  $("#main").innerHTML = `<h2 style="font:700 1.6rem var(--display);padding:30px clamp(16px,4vw,48px) 0">${title}</h2>` +
+  $("#main").innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:30px clamp(16px,4vw,48px) 0">
+      <h2 style="font:700 1.6rem var(--display);margin:0">${title}</h2>
+      <button class="btn ghost" onclick="home()">← Back to Vault</button>
+    </div>` +
     (items.length ? `<div class="grid">${items.map(i => card(i)).join("")}</div>` : `<p class="msg">${empty}</p>`);
 }
 
 /* Live Search */
-let st;
 $("#q").addEventListener("input", e => {
   clearTimeout(st);
   const v = e.target.value.trim().toLowerCase();
@@ -440,12 +469,17 @@ async function handleSuggestSubmit(e) {
       closeSuggestModal();
       $("#suggestForm").reset();
       showToast("📬 Thank you! Your recommendation was submitted to the author.");
-    } else {
-      alert("Submission failed. Please try again.");
+      return;
     }
-  } catch {
-    alert("Cannot connect to server. Please try again later.");
-  }
+  } catch {}
+
+  // Static site / offline fallback
+  const offlineList = store.get("ronin_offline_suggestions", []);
+  offlineList.push({ type, title, creator, by, link, notes, submittedAt: new Date().toISOString() });
+  store.set("ronin_offline_suggestions", offlineList);
+  closeSuggestModal();
+  $("#suggestForm").reset();
+  showToast("📬 Saved locally! (Backend offline: use 'Copy' to share directly)");
 }
 
 function copySuggestionText() {

@@ -41,21 +41,41 @@ roninlife-app/
 
 ---
 
-## 🚀 Running the Project
+## 🚀 Running the Project Locally
 
-1. Open PowerShell or Command Prompt:
-   ```powershell
-   cd "C:\Users\shenk\.gemini\antigravity\scratch\roninlife-app"
-   ```
-
-2. Start the application (zero external npm dependencies required — runs natively on Node.js):
+1. Open PowerShell or Command Prompt in the project folder:
    ```powershell
    npm start
    ```
 
-3. Open in your browser:
+2. Open in your browser:
    - **Public Visitor Showcase**: `http://localhost:3000`
-   - **Author Admin Dashboard**: `http://localhost:3000/admin`
+   - **Author Admin Dashboard**: `http://localhost:3000/admin` (or `/admin.html`)
+
+---
+
+## 🌐 Publishing as a Website on GitHub Pages
+
+This vault is pre-configured to deploy effortlessly to **GitHub Pages**:
+
+### Option A: Automatic Deployment via GitHub Actions (Recommended)
+1. Push this repository to GitHub.
+2. In your GitHub repository, click **Settings** → **Pages**.
+3. Under **Build and deployment** → **Source**, select **GitHub Actions**.
+4. The included `.github/workflows/deploy.yml` workflow will automatically build and publish your website!
+
+### Option B: Deploy from Branch
+1. In your GitHub repository, click **Settings** → **Pages**.
+2. Under **Build and deployment** → **Source**, select **Deploy from a branch**.
+3. Set the branch to `main` and folder to `/ (root)`.
+4. Click **Save**. The root `index.html` will seamlessly load your vault showcase.
+
+---
+
+## ☁️ Full-Stack Cloud Deployment (Optional)
+
+If you wish to host the dynamic author backend with persistent live API authentication:
+- **Render / Railway / Glitch**: Connect your GitHub repository, set the build command to `npm install` (or none, zero dependencies needed), and start command to `node server.js`. Add your `ADMIN_PASSWORD` in environment variables.
 
 ---
 

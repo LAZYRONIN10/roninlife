@@ -1,5 +1,18 @@
-const { LIBRARY_FILE, readJson, writeJson } = require('../config');
+const path = require('path');
+const fs = require('fs');
+const { LIBRARY_FILE, FRONTEND_DIR, readJson, writeJson } = require('../config');
 const { requireAdmin } = require('../middleware/auth');
+
+const FRONTEND_LIBRARY_FILE = path.join(FRONTEND_DIR, 'data', 'library.json');
+
+function saveLibrary(data) {
+  writeJson(LIBRARY_FILE, data);
+  try {
+    const dir = path.dirname(FRONTEND_LIBRARY_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    writeJson(FRONTEND_LIBRARY_FILE, data);
+  } catch {}
+}
 
 function handleLibraryRoutes(req, res, pathname, body, sendJson) {
   // GET /api/library (Public)
@@ -37,7 +50,7 @@ function handleLibraryRoutes(req, res, pathname, body, sendJson) {
     };
 
     library.unshift(newItem);
-    writeJson(LIBRARY_FILE, library);
+    saveLibrary(library);
 
     return sendJson(res, 200, { success: true, item: newItem });
   }
@@ -57,7 +70,7 @@ function handleLibraryRoutes(req, res, pathname, body, sendJson) {
       return sendJson(res, 404, { error: 'Item not found.' });
     }
 
-    writeJson(LIBRARY_FILE, library);
+    saveLibrary(library);
     return sendJson(res, 200, { success: true, message: 'Item deleted from Vault.' });
   }
 

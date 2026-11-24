@@ -117,6 +117,17 @@ async function loadLibrary() {
     if (res.ok) {
       currentLibrary = await res.json();
       renderItemsTable();
+      return;
+    }
+  } catch (err) {
+    console.warn("Could not reach /api/library, checking static data file", err);
+  }
+
+  try {
+    const staticRes = await fetch('data/library.json');
+    if (staticRes.ok) {
+      currentLibrary = await staticRes.json();
+      renderItemsTable();
     }
   } catch (err) {
     console.error("Failed to load library", err);
@@ -195,7 +206,7 @@ function renderSuggestions() {
       <p>${esc(s.notes)}</p>
       ${s.link ? `<p><a href="${esc(s.link)}" target="_blank" rel="noopener" style="color:var(--cyan);font-size:.85rem">🔗 View Submitted Link ↗</a></p>` : ''}
       <div style="display:flex;gap:10px">
-        <button class="btn primary" style="padding:6px 14px;font-size:.78rem" onclick="adoptSuggestion('${esc(s.type)}', '${esc(s.title)}', '${esc(s.creator)}', '${esc(s.link || "")}', '${esc(s.notes)}')">Publish to Vault</button>
+        <button class="btn primary" style="padding:6px 14px;font-size:.78rem" onclick="adoptSuggestionById('${s.id}')">Publish to Vault</button>
         <button class="btn ghost" style="padding:6px 14px;font-size:.78rem;color:#fca5a5" onclick="dismissSuggestion('${s.id}')">Dismiss</button>
       </div>
     </div>
@@ -293,6 +304,12 @@ async function dismissSuggestion(id) {
       showToast("Suggestion dismissed.");
     }
   } catch {}
+}
+
+function adoptSuggestionById(id) {
+  const s = currentSuggestions.find(x => x.id === id);
+  if (!s) return;
+  adoptSuggestion(s.type, s.title, s.creator, s.link, s.notes);
 }
 
 function adoptSuggestion(type, title, creator, link, notes) {

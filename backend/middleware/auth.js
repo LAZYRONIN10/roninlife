@@ -12,7 +12,7 @@ function cleanExpiredSessions() {
     }
   }
 }
-setInterval(cleanExpiredSessions, 60 * 60 * 1000);
+setInterval(cleanExpiredSessions, 60 * 60 * 1000).unref();
 
 // Constant-time password check
 function safePasswordCheck(input, expected = ADMIN_PASSWORD) {
