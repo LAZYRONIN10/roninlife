@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>RONINLIFE — Author Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+
+<body>
+  <!-- Admin Navigation Header -->
+  <header class="admin-header">
+    <a href="/admin" class="brand">
+      <h1>RONINLIFE</h1>
+      <span class="admin-badge">AUTHOR PORTAL</span>
+    </a>
+    <div style="display:flex;gap:12px;align-items:center">
+      <a href="/" target="_blank" class="btn ghost" style="font-size:.8rem">👁 View Public Site ↗</a>
+      <button id="logoutBtn" class="btn ghost" style="display:none;color:#fca5a5" onclick="handleLogout()">Logout</button>
+    </div>
+  </header>
+
+  <!-- Login Gate (Rendered when unauthenticated) -->
+  <section id="loginSection" class="login-wrap">
+    <div class="login-card">
+      <h2>Author Access 🔒</h2>
+      <p>Enter your author password to manage the vault library and review reader suggestions.</p>
+      <form onsubmit="handleLogin(event)">
+        <input id="adminPasswordInput" type="password" placeholder="Enter secure password..." autofocus required>
+        <button type="submit" class="btn primary" id="loginBtn" style="width:100%;justify-content:center">Enter Dashboard</button>
+      </form>
+      <p style="font-size:.75rem;color:var(--mute);margin-top:16px;margin-bottom:0">Password configured in server <code>.env</code> file.</p>
+    </div>
+  </section>
+
+  <!-- Author Dashboard (Unlocked after authentication) -->
+  <section id="dashboardSection" class="dashboard" style="display:none">
+    <!-- Quick Statistics -->
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="label">Total Vault Titles</div>
+        <div class="num" id="statTotal">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">Books</div>
+        <div class="num" id="statBooks">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">Original Stories</div>
+        <div class="num" id="statStories">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">Cinema & Series</div>
+        <div class="num" id="statCinema">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">Visitor Suggestions</div>
+        <div class="num" id="statSuggestions">0</div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="tabPublish" onclick="switchTab('tabPublish')">+ Publish New Item</button>
+      <button class="tab-btn" data-tab="tabItems" onclick="switchTab('tabItems')">📚 Manage Vault Collection</button>
+      <button class="tab-btn" data-tab="tabSuggestions" onclick="switchTab('tabSuggestions')">📥 Visitor Inbox (<span id="badgeInbox">0</span>)</button>
+    </div>
+
+    <!-- Tab 1: Publish New Item -->
+    <div id="tabPublish" class="panel-section active">
+      <div class="form-card">
+        <h2 style="font:700 1.3rem var(--display);margin-bottom:16px">Publish to Vault</h2>
+        <form id="publishForm" onsubmit="handlePublishSubmit(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="uType">Media Category</label>
+              <select id="uType">
+                <option value="book">📚 Book</option>
+                <option value="story" selected>✒️ Original Short Story / Writing</option>
+                <option value="movie">🎬 Film / Shortfilm</option>
+                <option value="tv">📺 TV / Web Series</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="uTitle">Title *</label>
+              <input id="uTitle" type="text" placeholder="Title..." required>
+            </div>
+
+            <div class="form-group">
+              <label for="uCreator">Author / Director *</label>
+              <input id="uCreator" type="text" placeholder="Author or Creator..." required>
+            </div>
+
+            <div class="form-group">
+              <label for="uDate">Year / Read Length</label>
+              <input id="uDate" type="text" placeholder="e.g. 2024 or 15 min read">
+            </div>
+
+            <div class="form-group">
+              <label for="uRating">Rating (out of 10)</label>
+              <input id="uRating" type="number" min="1" max="10" step="0.1" value="9.5">
+            </div>
+
+            <div class="form-group">
+              <label for="uGenres">Genres (comma separated)</label>
+              <input id="uGenres" type="text" placeholder="Sci-Fi, Cyberpunk, Mystery">
+            </div>
+
+            <div class="form-group full">
+              <label for="uOv">Synopsis / Overview *</label>
+              <textarea id="uOv" rows="3" placeholder="Brief summary of the work..." required></textarea>
+            </div>
+
+            <div class="form-group full">
+              <label>Cover Image (Upload File or Paste Web Link)</label>
+              <div class="img-upload-box" onclick="document.getElementById('uFile').click()">
+                <span id="uploadPrompt">📁 Click to choose an image from your computer</span>
+                <img id="imgPreview" class="img-preview" alt="Preview">
+                <input type="file" id="uFile" accept="image/*" style="display:none" onchange="previewFile(this)">
+              </div>
+              <input id="uPosterUrl" type="url" placeholder="Or paste an image web link (https://...)" style="margin-top:8px" oninput="previewUrl(this.value)">
+            </div>
+
+            <div class="form-group full">
+              <label for="uUrl">External Read / Watch Link (Optional)</label>
+              <input id="uUrl" type="url" placeholder="YouTube, Vimeo, Goodreads, Substack, PDF...">
+            </div>
+
+            <div class="form-group full">
+              <label for="uText">Story Text / Chapters (Optional: Readers can read directly on site)</label>
+              <textarea id="uText" rows="6" placeholder="Paste full short story or chapter text here..."></textarea>
+            </div>
+
+            <div class="form-group full">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+                <input type="checkbox" id="uAuthorPick" checked style="width:18px;height:18px">
+                <span style="color:var(--gold);font-weight:700">⭐ Feature in "Author's All-Time Favorites"</span>
+              </label>
+            </div>
+          </div>
+
+          <div style="margin-top:20px;display:flex;justify-content:flex-end">
+            <button type="submit" class="btn primary" id="publishSubmitBtn">🚀 Publish to Vault</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Tab 2: Manage Vault Collection -->
+    <div id="tabItems" class="panel-section">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Title / Creator</th>
+              <th>Category</th>
+              <th>Year / Length</th>
+              <th>Rating</th>
+              <th>Curator Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="itemsTableBody">
+            <tr><td colspan="6" style="text-align:center;padding:30px">Loading items...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 3: Visitor Recommendations Inbox -->
+    <div id="tabSuggestions" class="panel-section">
+      <div id="suggestionsContainer">
+        <p style="padding:30px 0;color:var(--mute)">Loading inbox...</p>
+      </div>
+    </div>
+  </section>
+
+  <div id="toast" class="toast">Action completed!</div>
+
+  <script src="/js/admin.js"></script>
+</body>
+
+</html>

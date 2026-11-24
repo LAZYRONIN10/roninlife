@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>RONINLIFE — Stories, Books & Cinema</title>
+  <meta name="description"
+    content="Personal vault of original short stories, essential books, films, and cinematic series. Curated by the author.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="amb"></div>
+
+  <header>
+    <a class="logo-wrap" href="/" onclick="home();return false">
+      <span class="logo">RONINLIFE</span>
+      <span class="logo-sub">Stories · Books · Cinema</span>
+    </a>
+
+    <div class="search">
+      <input id="q" type="search" placeholder="Search books, stories, films, series... ( / )" autocomplete="off">
+    </div>
+
+    <div class="nav-actions">
+      <!-- Public Visitor Suggestion Button -->
+      <button class="btn suggest" onclick="openSuggestModal()">💡 Suggest a Title</button>
+      <button class="btn ghost" id="listBtn">♥ My List</button>
+      <div class="live"><i></i><span id="upd">RONIN VAULT</span></div>
+    </div>
+  </header>
+
+  <main id="main"></main>
+
+  <footer>
+    <p><strong>RONINLIFE</strong> — Author & Creator Vault. Curated original stories, literature, and cinema.</p>
+    <p>Have a story or film recommendation? Click <a href="#" onclick="openSuggestModal();return false">"💡 Suggest a Title"</a> above.</p>
+    <p style="margin-top:12px"><a href="/admin" style="color:var(--mute);font-size:.75rem">Author Portal 🔒</a></p>
+  </footer>
+
+  <!-- Details Sheet Modal -->
+  <div class="modal" id="modal">
+    <div class="sheet" id="sheet"></div>
+  </div>
+
+  <!-- Visitor "Suggest a Title" Modal -->
+  <div class="modal" id="suggestModal">
+    <div class="form-sheet">
+      <button class="btn ghost x" onclick="closeSuggestModal()">✕</button>
+      <h2>💡 Suggest a Title</h2>
+      <p class="desc">Have a mind-bending book, indie film, or story you think belongs in Ronin's Vault? Submit your recommendation directly to the author!</p>
+
+      <form id="suggestForm" onsubmit="handleSuggestSubmit(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="sType">Category</label>
+            <select id="sType">
+              <option value="Book">📚 Book</option>
+              <option value="Short Story">✒️ Short Story / Article</option>
+              <option value="Film">🎬 Film / Shortfilm</option>
+              <option value="Series">📺 TV / Web Series</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="sTitle">Title *</label>
+            <input id="sTitle" type="text" placeholder="e.g. Solaris, Ex Machina" required>
+          </div>
+
+          <div class="form-group">
+            <label for="sCreator">Author / Director</label>
+            <input id="sCreator" type="text" placeholder="Creator name...">
+          </div>
+
+          <div class="form-group">
+            <label for="sYourName">Your Name / Handle (Optional)</label>
+            <input id="sYourName" type="text" placeholder="Anonymous or Twitter handle">
+          </div>
+
+          <div class="form-group full">
+            <label for="sLink">Link / Reference (Optional)</label>
+            <input id="sLink" type="url" placeholder="Goodreads, trailer link, or article...">
+          </div>
+
+          <div class="form-group full">
+            <label for="sNotes">Why should the author check it out? *</label>
+            <textarea id="sNotes" rows="3" placeholder="What makes this story or film unforgettable? Why does it belong in the vault?" required></textarea>
+          </div>
+        </div>
+
+        <div class="form-btns">
+          <button type="button" class="btn ghost" onclick="closeSuggestModal()">Cancel</button>
+          <button type="button" class="btn ghost" onclick="copySuggestionText()">📋 Copy Recommendation</button>
+          <button type="submit" class="btn primary">🚀 Submit Recommendation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Action completed!</div>
+
+  <script src="/js/app.js"></script>
+</body>
+
+</html>

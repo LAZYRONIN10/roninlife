@@ -1,0 +1,10 @@
+{
+  "name": "roninlife-vault",
+  "version": "1.0.0",
+  "description": "Author's Vault for Stories, Books & Cinema with secure backend authentication",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  }
+}
