@@ -123,6 +123,13 @@ const server = http.createServer(async (req, res) => {
     return serveStaticFile(res, path.join(FRONTEND_DIR, 'admin.html'));
   }
 
+  // Favicon Fallback Handler
+  if (pathname === '/favicon.ico') {
+    const icoPath = path.join(FRONTEND_DIR, 'favicon.ico');
+    if (fs.existsSync(icoPath)) return serveStaticFile(res, icoPath);
+    return serveStaticFile(res, path.join(FRONTEND_DIR, 'favicon.svg'));
+  }
+
   // Static Assets: CSS, JS, Images
   const safeRelative = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '');
   const candidatePath = path.join(FRONTEND_DIR, safeRelative);
