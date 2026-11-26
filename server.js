@@ -125,6 +125,8 @@ const server = http.createServer(async (req, res) => {
 
   // Favicon Fallback Handler
   if (pathname === '/favicon.ico') {
+    const pngPath = path.join(FRONTEND_DIR, 'favicon.png');
+    if (fs.existsSync(pngPath)) return serveStaticFile(res, pngPath);
     const icoPath = path.join(FRONTEND_DIR, 'favicon.ico');
     if (fs.existsSync(icoPath)) return serveStaticFile(res, icoPath);
     return serveStaticFile(res, path.join(FRONTEND_DIR, 'favicon.svg'));
