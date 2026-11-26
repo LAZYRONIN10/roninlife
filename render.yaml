@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: roninlife-backend
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false # Paste your Neon PostgreSQL connection string in Render dashboard
+      - key: ADMIN_PASSWORD
+        generateValue: true # Generates secure password automatically, or set manually
+      - key: AUTHOR_EMAIL
+        value: author@roninlife.com

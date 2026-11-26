@@ -1,6 +1,29 @@
 # RONINLIFE — Full-Stack Creative Vault
 
-A complete, production-ready full-stack creative web application with dedicated frontend and backend separation.
+A complete, production-ready full-stack creative web application with dedicated frontend, backend, and cloud database architecture.
+
+---
+
+## 🏛️ Deployment Architecture: Neon + Render + GitHub
+
+- **Render**: Hosts the live Node.js backend & frontend application.
+- **Neon PostgreSQL**: Cloud serverless database storing vault titles (books, movies, stories), user/author accounts, sessions, and visitor suggestions.
+- **GitHub**: Maintains the source code repository with automated CI/CD to Render.
+
+```
+                  ┌──────────────────────┐
+                  │    GitHub Repo       │
+                  │  (Source & CI/CD)    │
+                  └──────────┬───────────┘
+                             │ pushes
+                             ▼
+  ┌────────────────┐     ┌──────────────────────┐
+  │ Neon Postgres  │◄───►│    Render Service    │
+  │  (Database)    │     │  (Node.js + Frontend)│
+  └────────────────┘     └──────────▲───────────┘
+                                    │
+                            Visitors & Author
+```
 
 ---
 
@@ -9,24 +32,26 @@ A complete, production-ready full-stack creative web application with dedicated 
 ```
 roninlife-app/
 │
-├── .env                       # Secret author password & server configuration (ignored by git)
-├── .env.example               # Safe template for cloud deployment
-├── .gitignore                 # Prevents pushing .env and logs to GitHub
-├── package.json               # Project manifest
+├── .env                       # Local secret config (ignored by git)
+├── .env.example               # Template for cloud deployment variables
+├── .gitignore                 # Prevents pushing .env, node_modules, and logs
+├── package.json               # Project manifest (pg driver)
+├── render.yaml                # Render Infrastructure-as-Code Blueprint
 ├── README.md                  # Documentation
-├── server.js                  # Pure Node.js HTTP server & API dispatcher
+├── server.js                  # Node.js HTTP server & API dispatcher
 │
-├── backend/                   # 🔒 SECURE BACKEND
-│   ├── config.js              # Server configuration & JSON data helpers
+├── backend/                   # 🔒 BACKEND & DATABASE
+│   ├── config.js              # Server configuration & environment parser
+│   ├── db.js                  # Neon PostgreSQL connection, schema & auto-seeding
 │   ├── middleware/
-│   │   └── auth.js            # Cryptographic token auth & constant-time password checks
+│   │   └── auth.js            # Cryptographic scrypt authentication & session tokens
 │   ├── routes/
 │   │   ├── auth.js            # /api/auth/login, verify, logout
-│   │   ├── library.js         # /api/library, /api/items (POST, DELETE)
+│   │   ├── library.js         # /api/library (GET), /api/items (POST, DELETE)
 │   │   └── suggestions.js     # /api/suggestions (POST visitor, GET/DELETE admin)
 │   └── data/
-│       ├── library.json       # Permanent database for books, stories & films
-│       └── suggestions.json   # Visitor recommendations inbox
+│       ├── library.json       # Initial seed database (books, stories & films)
+│       └── suggestions.json   # Local fallback inbox
 │
 └── frontend/                  # 🎨 MODULAR FRONTEND
     ├── index.html             # Public visitor showcase (zero admin code/forms)
@@ -41,16 +66,58 @@ roninlife-app/
 
 ---
 
-## 🚀 Running the Project Locally
+## 🚀 Setup & Cloud Deployment Guide
 
-1. Open PowerShell or Command Prompt in the project folder:
+### 1. Create your Free Neon PostgreSQL Database
+1. Go to [neon.tech](https://neon.tech) and sign up / log in.
+2. Click **Create Project** (Name: `roninlife-db`).
+3. Under **Connection Details**, copy your **Connection String** (`postgresql://...`).
+4. Ensure `Pooled connection` is selected or standard connection with `?sslmode=require`.
+
+### 2. Deploy to Render
+1. Go to [render.com](https://render.com) and log in with your GitHub account.
+2. Click **New +** ➔ **Web Service**.
+3. Connect your repository: `LAZYRONIN10/roninlife`.
+4. Configure the service settings:
+   - **Name**: `roninlife`
+   - **Environment**: `Node`
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+   - **Instance Type**: `Free`
+5. In **Environment Variables**, add:
+   - `DATABASE_URL`: *(Paste your Neon connection string)*
+   - `ADMIN_PASSWORD`: *(Choose a strong secret author password)*
+   - `AUTHOR_EMAIL`: *(Your email address)*
+6. Click **Deploy Web Service**!
+7. The database tables (`users`, `library_items`, `suggestions`, `sessions`) will be automatically created and seeded on the first boot.
+
+---
+
+## 💻 Running Locally
+
+1. Install dependencies:
+   ```powershell
+   npm install
+   ```
+
+2. (Optional) In your local `.env`, paste your Neon `DATABASE_URL`:
+   ```env
+   PORT=3000
+   ADMIN_PASSWORD=your_secret_password
+   AUTHOR_EMAIL=author@roninlife.com
+   DATABASE_URL=postgresql://user:pass@ep-xyz.neon.tech/neondb?sslmode=require
+   ```
+   *(Note: If `DATABASE_URL` is omitted, the app automatically runs in local JSON file-based mode!)*
+
+3. Start the server:
    ```powershell
    npm start
    ```
 
-2. Open in your browser:
-   - **Public Visitor Showcase**: `http://localhost:3000`
-   - **Author Admin Dashboard**: `http://localhost:3000/admin` (or `/admin.html`)
+4. Open in browser:
+   - **Public Showcase**: `http://localhost:3000`
+   - **Author Admin Dashboard**: `http://localhost:3000/admin`
+
 
 ---
 

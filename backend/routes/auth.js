@@ -1,16 +1,18 @@
-const { safePasswordCheck, createSession, verifyToken, destroySession, getBearerToken } = require('../middleware/auth');
+const { authenticateUser, verifyToken, destroySession, getBearerToken } = require('../middleware/auth');
 
-function handleAuthRoutes(req, res, pathname, body, sendJson) {
+async function handleAuthRoutes(req, res, pathname, body, sendJson) {
   // POST /api/auth/login
   if (req.method === 'POST' && pathname === '/api/auth/login') {
-    const { password } = body || {};
-    if (!password || !safePasswordCheck(password)) {
-      return sendJson(res, 401, { success: false, error: 'Incorrect author password.' });
+    const { password, username, identifier } = body || {};
+    const id = username || identifier || '';
+    const result = await authenticateUser(id, password);
+    if (!result.success) {
+      return sendJson(res, 401, { success: false, error: result.error || 'Incorrect author credentials.' });
     }
-    const token = createSession();
     return sendJson(res, 200, {
       success: true,
-      token,
+      token: result.token,
+      user: result.user,
       message: 'Author session authenticated successfully.'
     });
   }
@@ -18,14 +20,14 @@ function handleAuthRoutes(req, res, pathname, body, sendJson) {
   // GET /api/auth/verify
   if (req.method === 'GET' && pathname === '/api/auth/verify') {
     const token = getBearerToken(req);
-    const isAdmin = verifyToken(token);
+    const isAdmin = await verifyToken(token);
     return sendJson(res, 200, { isAdmin });
   }
 
   // POST /api/auth/logout
   if (req.method === 'POST' && pathname === '/api/auth/logout') {
     const token = getBearerToken(req);
-    destroySession(token);
+    await destroySession(token);
     return sendJson(res, 200, { success: true });
   }
 

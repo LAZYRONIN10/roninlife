@@ -4,6 +4,7 @@ const fs = require('fs');
 const { URL } = require('url');
 
 const { PORT, FRONTEND_DIR } = require('./backend/config');
+const { initDb, isDbConnected } = require('./backend/db');
 const { handleAuthRoutes } = require('./backend/routes/auth');
 const { handleLibraryRoutes } = require('./backend/routes/library');
 const { handleSuggestionRoutes } = require('./backend/routes/suggestions');
@@ -95,17 +96,17 @@ const server = http.createServer(async (req, res) => {
      API ROUTES DISPATCHER
      ======================================================================== */
   if (pathname.startsWith('/api/auth')) {
-    if (handleAuthRoutes(req, res, pathname, body, sendJson)) return;
+    if (await handleAuthRoutes(req, res, pathname, body, sendJson)) return;
     return sendJson(res, 404, { error: 'Auth endpoint not found' });
   }
 
   if (pathname.startsWith('/api/library') || pathname.startsWith('/api/items')) {
-    if (handleLibraryRoutes(req, res, pathname, body, sendJson)) return;
+    if (await handleLibraryRoutes(req, res, pathname, body, sendJson)) return;
     return sendJson(res, 404, { error: 'Library endpoint not found' });
   }
 
   if (pathname.startsWith('/api/suggestions')) {
-    if (handleSuggestionRoutes(req, res, pathname, body, sendJson)) return;
+    if (await handleSuggestionRoutes(req, res, pathname, body, sendJson)) return;
     return sendJson(res, 404, { error: 'Suggestion endpoint not found' });
   }
 
@@ -133,11 +134,18 @@ const server = http.createServer(async (req, res) => {
   return serveStaticFile(res, path.join(FRONTEND_DIR, 'index.html'));
 });
 
-server.listen(PORT, () => {
-  console.log(`=======================================================`);
-  console.log(`  RONINLIFE FULL-STACK ARCHITECTURE READY`);
-  console.log(`  Public Visitor Showcase : http://localhost:${PORT}`);
-  console.log(`  Author Admin Dashboard  : http://localhost:${PORT}/admin`);
-  console.log(`  Backend Engine          : Pure Node.js (Zero external dependencies)`);
-  console.log(`=======================================================`);
-});
+async function startServer() {
+  await initDb();
+  server.listen(PORT, () => {
+    console.log(`=======================================================`);
+    console.log(`  RONINLIFE FULL-STACK ARCHITECTURE READY`);
+    console.log(`  Public Visitor Showcase : http://localhost:${PORT}`);
+    console.log(`  Author Admin Dashboard  : http://localhost:${PORT}/admin`);
+    console.log(`  Database Engine         : ${isDbConnected() ? 'Neon PostgreSQL' : 'Local JSON Fallback'}`);
+    console.log(`=======================================================`);
+  });
+}
+
+startServer();
+
+module.exports = server;
