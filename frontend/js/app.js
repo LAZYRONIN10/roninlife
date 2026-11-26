@@ -22,11 +22,11 @@ let st;
 
 const CHIPS = [
   ["all", "All"],
-  ["author", "⭐ Author's Picks"],
-  ["book", "📚 Books"],
-  ["story", "✒️ Short Stories"],
-  ["movie", "🎬 Films"],
-  ["tv", "📺 Series"],
+  ["author", "Curator's Selection"],
+  ["book", "Books"],
+  ["story", "Short Stories"],
+  ["movie", "Cinema"],
+  ["tv", "Series"],
   ["Sci-Fi", "Sci-Fi"],
   ["Cyberpunk", "Cyberpunk"],
   ["Philosophy", "Philosophy"],
@@ -85,14 +85,17 @@ function card(it) {
   if (it.poster) {
     pic = `<img loading="lazy" src="${esc(it.poster)}" alt="${esc(it.title)}">`;
   } else {
-    const icon = it.type === "book" ? "📚" : it.type === "story" ? "✒️" : "🎬";
-    pic = `<div class="ph"><div style="font-size:2rem;margin-bottom:6px">${icon}</div>${esc(it.title)}<span class="ph-sub">${esc(it.creator || "")}</span></div>`;
+    pic = `<div class="ph">
+      <span class="ph-type">${esc(it.type).toUpperCase()}</span>
+      <div class="ph-title">${esc(it.title)}</div>
+      <span class="ph-sub">${esc(it.creator || "")}</span>
+    </div>`;
   }
 
   const isPick = it.isAuthorPick;
-  const pickHtml = isPick ? `<span class="pick-pill">★ AUTHOR'S PICK</span>` : "";
-  const rateHtml = `<span class="rate">★ ${it.rating ? Number(it.rating).toFixed(1) : "–"}</span>`;
-  const heartHtml = list[k] ? `<span class="heart">♥</span>` : "";
+  const pickHtml = isPick ? `<span class="pick-pill">FEATURED</span>` : "";
+  const rateHtml = `<span class="rate">${it.rating ? Number(it.rating).toFixed(1) : "–"}</span>`;
+  const heartHtml = list[k] ? `<span class="heart">SAVED</span>` : "";
   const typeHtml = `<span class="type-pill ${it.type}">${it.type}</span>`;
   const genresStr = Array.isArray(it.g) ? it.g.join(",") : "";
 
@@ -116,12 +119,12 @@ function filters() {
 function authorBanner() {
   return `<div class="author-intro">
     <div class="author-info">
-      <h2>Ronin's Vault <span class="badge-author">CURATOR & AUTHOR</span></h2>
-      <p>Welcome to my personal creative archive. Here you'll find my original short stories, essential literature, and cinematic masterworks. Have a recommendation? Send it via the suggest button!</p>
+      <h2>Curator's Archive <span class="badge-author">CURATOR SELECTION</span></h2>
+      <p>A curated personal archive of literature, original prose, and cinema. Curated by Ronin.</p>
     </div>
     <div class="author-cta">
-      <button class="btn gold" onclick="setChipFilter('author')">⭐ Author's Favorites</button>
-      <button class="btn suggest" onclick="openSuggestModal()">💡 Suggest a Title</button>
+      <button class="btn gold" onclick="setChipFilter('author')">Curator's Selection</button>
+      <button class="btn suggest" onclick="openSuggestModal()">Suggest a Title</button>
     </div>
   </div>`;
 }
@@ -147,17 +150,17 @@ async function load() {
 
   html += `<div id="rows">
     <section class="row">
-      <h2>⭐ Author's All-Time Favorites <span><button data-s="-1">‹</button><button data-s="1">›</button></span></h2>
+      <h2>Curator's Selection <span><button data-s="-1">‹</button><button data-s="1">›</button></span></h2>
       <div class="track">${authorPicks.map(i => card(i)).join("")}</div>
     </section>
 
     <section class="row">
-      <h2>📚 Books & Original Stories <span><button data-s="-1">‹</button><button data-s="1">›</button></span></h2>
+      <h2>Literature & Original Writing <span><button data-s="-1">‹</button><button data-s="1">›</button></span></h2>
       <div class="track">${booksAndStories.map(i => card(i)).join("")}</div>
     </section>
 
     <section class="row">
-      <h2>🎬 Cinema & Series Collection <span><button data-s="-1">‹</button><button data-s="1">›</button></span></h2>
+      <h2>Cinema & Television <span><button data-s="-1">‹</button><button data-s="1">›</button></span></h2>
       <div class="track">${filmsAndTv.map(i => card(i)).join("")}</div>
     </section>
   </div>`;
@@ -186,12 +189,12 @@ function drawHero() {
 
   h.innerHTML = `<div class="bg" style="background-image:url(${esc(bgImg)})"></div>
   <div class="txt">
-    <span class="tag">${it.isAuthorPick ? "⭐ AUTHOR'S PICK · " : ""}${typeLabel} · ★ ${Number(it.rating || 9.5).toFixed(1)}</span>
+    <span class="tag">${it.isAuthorPick ? "FEATURED · " : ""}${typeLabel.toUpperCase()} · ${Number(it.rating || 9.5).toFixed(1)}</span>
     <h1>${esc(it.title)}</h1>
     <p>${esc(it.ov)}</p>
     <div class="acts">
-      <button class="btn" data-open="${k}">${it.fullText ? "📖 Read Story" : it.url ? "▶ Open & Experience" : "🔍 View Details"}</button>
-      <button class="btn ghost" data-fav="${k}">${list[k] ? "♥ In My List" : "+ My List"}</button>
+      <button class="btn" data-open="${k}">${it.fullText ? "Read Story" : it.url ? "Experience" : "View Details"}</button>
+      <button class="btn ghost" data-fav="${k}">${list[k] ? "Saved" : "Save to List"}</button>
     </div>
   </div>
   <div class="dots">${heroItems.map((_, i) => `<b class="${i === heroI ? "on" : ""}" data-h="${i}"></b>`).join("")}</div>`;
@@ -276,7 +279,7 @@ $("#q").addEventListener("input", e => {
 
 $("#listBtn").onclick = () => {
   const items = Object.values(list);
-  showGrid(items, "♥ My Saved List", "Your list is currently empty. Click the heart or '+ My List' button on any book, story, or film to save it here.");
+  showGrid(items, "Saved Collection", "Your saved collection is currently empty. Click 'Save to List' on any title to save it here.");
 };
 
 /* Details Modal */
@@ -294,22 +297,22 @@ async function openModal(k) {
   if (it.url) {
     const yt = getYouTubeId(it.url);
     if (yt) {
-      videoEmbed = `<button class="btn" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5" onclick="embedYouTube('${yt}')">▶ Play Video / Trailer</button>`;
+      videoEmbed = `<button class="btn" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5" onclick="embedYouTube('${yt}')">Play Trailer</button>`;
     }
   }
 
   let readStoryBlock = "";
   if (it.fullText) {
     readStoryBlock = `<div class="story-reader">
-      <h3>📖 Read Full Story</h3>
+      <h3>Full Text</h3>
       <div class="story-text">${esc(it.fullText).replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br>")}</div>
     </div>`;
   }
 
   let extButton = "";
   if (it.url) {
-    const label = it.type === "book" ? "📖 Open Book Link / Preview ↗" :
-      it.type === "story" ? "✒️ Read Original Story Source ↗" : "▶ Watch Stream / Trailer ↗";
+    const label = it.type === "book" ? "Open Reference ↗" :
+      it.type === "story" ? "Read Source ↗" : "Watch Trailer ↗";
     extButton = `<a href="${esc(it.url)}" target="_blank" rel="noopener" class="btn primary">${label}</a>`;
   }
 
@@ -323,18 +326,18 @@ async function openModal(k) {
     <div class="body">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
         <span class="type-pill ${it.type}" style="position:static">${it.type}</span>
-        ${isPick ? `<span class="badge-author" style="font-size:.7rem;padding:3px 10px;border-radius:99px;background:linear-gradient(135deg,var(--gold),var(--ember));color:#07060c;font-weight:700">⭐ AUTHOR'S FAVORITE</span>` : ""}
+        ${isPick ? `<span class="badge-author" style="font-size:.68rem;padding:3px 10px;border-radius:99px;background:rgba(235,180,56,0.15);color:var(--gold);border:1px solid rgba(235,180,56,0.3);font-weight:600;letter-spacing:.06em">FEATURED</span>` : ""}
       </div>
       <h2>${esc(it.title)}</h2>
       ${it.creator ? `<p class="creator">${esc(it.creator)}</p>` : ""}
-      <p class="meta">${[it.date, "★ " + Number(it.rating || 0).toFixed(1), genresDisplay].filter(Boolean).join("  ·  ")}</p>
+      <p class="meta">${[it.date, Number(it.rating || 0).toFixed(1) + " Rating", genresDisplay].filter(Boolean).join("  ·  ")}</p>
       <p class="ov">${esc(it.ov || "No description available.")}</p>
       
       ${readStoryBlock}
 
       <div class="sheet-actions">
         ${extButton}
-        <button class="btn" data-fav="${k}" onclick="toggleFav('${k}',this)">${list[k] ? "♥ In My List" : "+ Add to My List"}</button>
+        <button class="btn" data-fav="${k}" onclick="toggleFav('${k}',this)">${list[k] ? "Saved in List" : "Save to List"}</button>
       </div>
     </div>`;
 }
@@ -367,14 +370,14 @@ function toggleFav(k, btn) {
   }
   store.set("ronin_favs", list);
 
-  if (btn) btn.textContent = list[k] ? "♥ In My List" : "+ Add to My List";
+  if (btn) btn.textContent = list[k] ? "Saved in List" : "Save to List";
 
   document.querySelectorAll(`.card[data-k="${k}"]`).forEach(c => {
     c.querySelector(".heart")?.remove();
-    if (list[k]) c.insertAdjacentHTML("beforeend", '<span class="heart">♥</span>');
+    if (list[k]) c.insertAdjacentHTML("beforeend", '<span class="heart">SAVED</span>');
   });
 
-  showToast(list[k] ? "Saved to My List" : "Removed from My List");
+  showToast(list[k] ? "Saved to your list" : "Removed from your list");
 }
 
 /* 3D Tilt */
@@ -468,7 +471,7 @@ async function handleSuggestSubmit(e) {
     if (res.ok) {
       closeSuggestModal();
       $("#suggestForm").reset();
-      showToast("📬 Thank you! Your recommendation was submitted to the author.");
+      showToast("Thank you. Your recommendation was submitted to the author.");
       return;
     }
   } catch {}
@@ -479,7 +482,7 @@ async function handleSuggestSubmit(e) {
   store.set("ronin_offline_suggestions", offlineList);
   closeSuggestModal();
   $("#suggestForm").reset();
-  showToast("📬 Saved locally! (Backend offline: use 'Copy' to share directly)");
+  showToast("Recommendation saved locally.");
 }
 
 function copySuggestionText() {
@@ -494,10 +497,10 @@ function copySuggestionText() {
     return;
   }
 
-  const text = `Roninlife Recommendation:\n${type}: ${title} (${creator || "Unknown"})\nSuggested by: ${by}\nNotes: ${notes}`;
+  const text = `Recommendation:\n${type}: ${title} (${creator || "Unknown"})\nSuggested by: ${by}\nNotes: ${notes}`;
 
   navigator.clipboard.writeText(text).then(() => {
-    showToast("📋 Recommendation copied to clipboard!");
+    showToast("Recommendation details copied to clipboard.");
   }).catch(() => {
     alert("Failed to copy.");
   });

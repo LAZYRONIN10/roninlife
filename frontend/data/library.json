@@ -9,7 +9,11 @@
     "isAuthorPick": true,
     "poster": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=700&q=80",
     "back": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1400&q=80",
-    "g": ["Sci-Fi", "Philosophy", "Epic"],
+    "g": [
+      "Sci-Fi",
+      "Philosophy",
+      "Epic"
+    ],
     "ov": "Set on the desert planet Arrakis, Dune is Frank Herbert's monumental masterwork of political intrigue, ecology, religion, and the triumph of human spirit over destiny.",
     "url": "https://www.goodreads.com/book/show/44767458-dune"
   },
@@ -23,7 +27,11 @@
     "isAuthorPick": true,
     "poster": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=700&q=80",
     "back": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1400&q=80",
-    "g": ["Cyberpunk", "Sci-Fi", "Noir"],
+    "g": [
+      "Cyberpunk",
+      "Sci-Fi",
+      "Noir"
+    ],
     "ov": "The quintessential cyberpunk novel. Case, a washed-up computer hacker hired by a mysterious employer for a last-chance run at an unthinkably powerful artificial intelligence.",
     "url": "https://www.goodreads.com/book/show/6088007-neuromancer"
   },
@@ -37,23 +45,13 @@
     "isAuthorPick": true,
     "poster": "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=700&q=80",
     "back": "https://images.unsplash.com/photo-1507842229451-7f01be8610ce?auto=format&fit=crop&w=1400&q=80",
-    "g": ["Magical Realism", "Philosophy", "Drama"],
+    "g": [
+      "Magical Realism",
+      "Philosophy",
+      "Drama"
+    ],
     "ov": "A surreal, hypnotic voyage following teenage runaway Kafka Tamura and Nakata, an aging man with the mysterious ability to converse with cats. A masterclass in memory and metaphysical riddles.",
     "url": "https://www.goodreads.com/book/show/4929.Kafka_on_the_Shore"
-  },
-  {
-    "id": "book_three_body",
-    "type": "book",
-    "title": "The Three-Body Problem",
-    "creator": "Cixin Liu",
-    "date": "2008",
-    "rating": 9.6,
-    "isAuthorPick": true,
-    "poster": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=700&q=80",
-    "back": "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=1400&q=80",
-    "g": ["Sci-Fi", "Thriller", "Cosmic"],
-    "ov": "Against the backdrop of China's Cultural Revolution, a secret military project sends signals into outer space to establish contact with aliens. An alien civilization on the brink of destruction captures the signal.",
-    "url": "https://www.goodreads.com/book/show/20518872-the-three-body-problem"
   },
   {
     "id": "story_neon_wanderer",
@@ -65,7 +63,11 @@
     "isAuthorPick": true,
     "poster": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=700&q=80",
     "back": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1400&q=80",
-    "g": ["Cyberpunk", "Original Story", "Noir"],
+    "g": [
+      "Cyberpunk",
+      "Original Story",
+      "Noir"
+    ],
     "ov": "In the rain-drenched subterranean alleys of Sector 8, an augmented courier discovers an encrypted quantum drive containing the discarded memories of the megacity's chief architect.",
     "fullText": "PROLOGUE: ACID RAIN AND FIBER OPTICS\n\nThe rain over Sector 8 never smelled like water; it smelled like heated copper and ozone. Below the mid-tier skybridges, darkness was not an absence of light, but a canvas upon which cheap holographic advertisements sputtered their garish pinks and cyans.\n\nKael pulled his collar higher against the damp chill. His ocular implant whirred faintly, recalibrating aperture to compensate for the glare reflecting off the puddles. Across the street, the noodle stall vendor—an old man whose prosthetic left hand moved with the stutter of uncalibrated servomotors—was already packing down his stall.\n\n\"Late run, courier?\" the old man muttered without looking up.\n\n\"Always late, Chen,\" Kael replied, slipping his gloved fingers into the internal pouch of his trench coat. The titanium capsule nestled against his chest was warm. Unnaturally warm. Solid-state storage shouldn't run at forty degrees Celsius unless the decryption cycles were continuously looping.\n\nCHAPTER I: THE ARCHITECT'S GHOST\n\nInside the safehouse on 44th avenue, the terminal blinked green in rhythmic intervals. Kael slotted the drive into the interface. The screen didn't open a directory. It projected a single volumetric waveform that spoke with a voice like shattering glass.\n\n\"If you are hearing this, the city has already forgotten who built its foundation...\"\n\nKael leaned closer. Outside, sirens wailed in the low frequency reserved for corporate security sweeps. The hunt had begun."
   },
@@ -79,7 +81,11 @@
     "isAuthorPick": true,
     "poster": "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=700&q=80",
     "back": "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=1400&q=80",
-    "g": ["Sci-Fi", "Original Story", "Cosmic"],
+    "g": [
+      "Sci-Fi",
+      "Original Story",
+      "Cosmic"
+    ],
     "ov": "A solitary listening post operator stationed at the edge of known space intercepts a musical frequency broadcasting from a dead star system.",
     "fullText": "The chronometer in Observation Pod 9 read 03:42 Station Standard Time. For seven hundred days, the listening array had recorded nothing louder than cosmic microwave background radiation—the faint hiss of the universe cooling off.\n\nThen, the low-frequency hydrophone array began to hum.\n\nIt wasn't random burst radiation. It possessed cadence. A four-note motif, repeating every eighty-four seconds, rising half an octave with every repetition.\n\nDr. Mira Vance pressed her headphones firmly against her ears. Her hands were trembling. The signal wasn't reflecting off any nearby moon; it was propagating from the center of an accretion disk that theoretically collapsed five billion years ago.\n\n\"Station AI,\" she whispered into the comms pickup.\n\n\"Yes, Dr. Vance?\" the synthetic voice replied calmly.\n\n\"Are we still alone?\"\n\nA pause lasted four long seconds—an eternity for an optical processor.\n\n\"According to planetary sensors, Dr. Vance... we never were.\""
   },
@@ -93,7 +99,11 @@
     "isAuthorPick": true,
     "poster": "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?auto=format&fit=crop&w=700&q=80",
     "back": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1400&q=80",
-    "g": ["Sci-Fi", "Cyberpunk", "Masterpiece"],
+    "g": [
+      "Sci-Fi",
+      "Cyberpunk",
+      "Masterpiece"
+    ],
     "ov": "Young Blade Runner K's discovery of a long-buried secret leads him to track down former Blade Runner Rick Deckard, who's been missing for thirty years.",
     "url": "https://www.youtube.com/watch?v=gCcx85zbxz4"
   },
@@ -107,7 +117,11 @@
     "isAuthorPick": true,
     "poster": "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=700&q=80",
     "back": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1400&q=80",
-    "g": ["Sci-Fi", "Drama", "Cosmic"],
+    "g": [
+      "Sci-Fi",
+      "Drama",
+      "Cosmic"
+    ],
     "ov": "When Earth becomes uninhabitable in the future, a farmer and ex-NASA pilot, Joseph Cooper, is tasked to pilot a spacecraft along with a team of researchers to find a new planet for humans.",
     "url": "https://www.youtube.com/watch?v=zSWdZVtXT7E"
   },
@@ -121,7 +135,11 @@
     "isAuthorPick": true,
     "poster": "https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?auto=format&fit=crop&w=700&q=80",
     "back": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1400&q=80",
-    "g": ["Sci-Fi", "Mystery", "Thriller"],
+    "g": [
+      "Sci-Fi",
+      "Mystery",
+      "Thriller"
+    ],
     "ov": "A family saga with a supernatural twist, set in a German town where the disappearance of two young children exposes the relationships and fractured lives among four families across multiple generations.",
     "url": "https://www.youtube.com/watch?v=rrwycJ08PSA"
   },
@@ -135,7 +153,11 @@
     "isAuthorPick": true,
     "poster": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=700&q=80",
     "back": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1400&q=80",
-    "g": ["Sci-Fi", "Thriller", "Dystopian"],
+    "g": [
+      "Sci-Fi",
+      "Thriller",
+      "Dystopian"
+    ],
     "ov": "Mark leads a team of office workers whose memories have been surgically divided between their work and personal lives. When a mysterious colleague appears outside of work, it begins a journey to discover the truth about their jobs.",
     "url": "https://www.youtube.com/watch?v=xEQP4VVuyrY"
   }

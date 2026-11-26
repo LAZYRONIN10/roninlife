@@ -21,7 +21,7 @@
       <span class="admin-badge">AUTHOR PORTAL</span>
     </a>
     <div style="display:flex;gap:12px;align-items:center">
-      <a href="index.html" target="_blank" class="btn ghost" style="font-size:.8rem">👁 View Public Site ↗</a>
+      <a href="index.html" target="_blank" class="btn ghost" style="font-size:.8rem">View Public Site ↗</a>
       <button id="logoutBtn" class="btn ghost" style="display:none;color:#fca5a5" onclick="handleLogout()">Logout</button>
     </div>
   </header>
@@ -29,13 +29,13 @@
   <!-- Login Gate (Rendered when unauthenticated) -->
   <section id="loginSection" class="login-wrap">
     <div class="login-card">
-      <h2>Author Access 🔒</h2>
-      <p>Enter your author password to manage the vault library and review reader suggestions.</p>
+      <h2>Author Access</h2>
+      <p>Enter your credentials to manage the vault library and review reader suggestions.</p>
       <form onsubmit="handleLogin(event)">
-        <input id="adminPasswordInput" type="password" placeholder="Enter secure password..." autofocus required>
+        <input id="adminPasswordInput" type="password" placeholder="Enter password..." autofocus required>
         <button type="submit" class="btn primary" id="loginBtn" style="width:100%;justify-content:center">Enter Dashboard</button>
       </form>
-      <p style="font-size:.75rem;color:var(--mute);margin-top:16px;margin-bottom:0">Password configured in server <code>.env</code> file.</p>
+      <p style="font-size:.75rem;color:var(--mute);margin-top:16px;margin-bottom:0">Author authentication configured via server environment.</p>
     </div>
   </section>
 
@@ -67,9 +67,9 @@
 
     <!-- Navigation Tabs -->
     <div class="tabs">
-      <button class="tab-btn active" data-tab="tabPublish" onclick="switchTab('tabPublish')">+ Publish New Item</button>
-      <button class="tab-btn" data-tab="tabItems" onclick="switchTab('tabItems')">📚 Manage Vault Collection</button>
-      <button class="tab-btn" data-tab="tabSuggestions" onclick="switchTab('tabSuggestions')">📥 Visitor Inbox (<span id="badgeInbox">0</span>)</button>
+      <button class="tab-btn active" data-tab="tabPublish" onclick="switchTab('tabPublish')">Publish New Title</button>
+      <button class="tab-btn" data-tab="tabItems" onclick="switchTab('tabItems')">Manage Vault Collection</button>
+      <button class="tab-btn" data-tab="tabSuggestions" onclick="switchTab('tabSuggestions')">Visitor Recommendations (<span id="badgeInbox">0</span>)</button>
     </div>
 
     <!-- Tab 1: Publish New Item -->
@@ -81,10 +81,10 @@
             <div class="form-group">
               <label for="uType">Media Category</label>
               <select id="uType">
-                <option value="book">📚 Book</option>
-                <option value="story" selected>✒️ Original Short Story / Writing</option>
-                <option value="movie">🎬 Film / Shortfilm</option>
-                <option value="tv">📺 TV / Web Series</option>
+                <option value="book">Book</option>
+                <option value="story" selected>Short Story / Original Prose</option>
+                <option value="movie">Film / Feature</option>
+                <option value="tv">Television / Series</option>
               </select>
             </div>
 
@@ -121,33 +121,33 @@
             <div class="form-group full">
               <label>Cover Image (Upload File or Paste Web Link)</label>
               <div class="img-upload-box" onclick="document.getElementById('uFile').click()">
-                <span id="uploadPrompt">📁 Click to choose an image from your computer</span>
+                <span id="uploadPrompt">Upload image from computer</span>
                 <img id="imgPreview" class="img-preview" alt="Preview">
                 <input type="file" id="uFile" accept="image/*" style="display:none" onchange="previewFile(this)">
               </div>
-              <input id="uPosterUrl" type="url" placeholder="Or paste an image web link (https://...)" style="margin-top:8px" oninput="previewUrl(this.value)">
+              <input id="uPosterUrl" type="url" placeholder="Or paste an image URL (https://...)" style="margin-top:8px" oninput="previewUrl(this.value)">
             </div>
 
             <div class="form-group full">
-              <label for="uUrl">External Read / Watch Link (Optional)</label>
-              <input id="uUrl" type="url" placeholder="YouTube, Vimeo, Goodreads, Substack, PDF...">
+              <label for="uUrl">External Reference / Source Link (Optional)</label>
+              <input id="uUrl" type="url" placeholder="Goodreads, YouTube, Vimeo, article...">
             </div>
 
             <div class="form-group full">
-              <label for="uText">Story Text / Chapters (Optional: Readers can read directly on site)</label>
-              <textarea id="uText" rows="6" placeholder="Paste full short story or chapter text here..."></textarea>
+              <label for="uText">Story Text / Content (Optional: For on-site reading)</label>
+              <textarea id="uText" rows="6" placeholder="Paste full short story, essay, or chapter text here..."></textarea>
             </div>
 
             <div class="form-group full">
               <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
                 <input type="checkbox" id="uAuthorPick" checked style="width:18px;height:18px">
-                <span style="color:var(--gold);font-weight:700">⭐ Feature in "Author's All-Time Favorites"</span>
+                <span style="color:var(--gold);font-weight:600;letter-spacing:0.02em">Feature in Curator's Selection</span>
               </label>
             </div>
           </div>
 
           <div style="margin-top:20px;display:flex;justify-content:flex-end">
-            <button type="submit" class="btn primary" id="publishSubmitBtn">🚀 Publish to Vault</button>
+            <button type="submit" class="btn primary" id="publishSubmitBtn">Publish to Vault</button>
           </div>
         </form>
       </div>

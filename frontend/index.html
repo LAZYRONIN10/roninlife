@@ -30,18 +30,18 @@
 
     <div class="nav-actions">
       <!-- Public Visitor Suggestion Button -->
-      <button class="btn suggest" onclick="openSuggestModal()">💡 Suggest a Title</button>
-      <button class="btn ghost" id="listBtn">♥ My List</button>
-      <div class="live"><i></i><span id="upd">RONIN VAULT</span></div>
+      <button class="btn suggest" onclick="openSuggestModal()">Suggest a Title</button>
+      <button class="btn ghost" id="listBtn">Saved List</button>
+      <div class="live"><i></i><span id="upd">VAULT ARCHIVE</span></div>
     </div>
   </header>
 
   <main id="main"></main>
 
   <footer>
-    <p><strong>RONINLIFE</strong> — Author & Creator Vault. Curated original stories, literature, and cinema.</p>
-    <p>Have a story or film recommendation? Click <a href="#" onclick="openSuggestModal();return false">"💡 Suggest a Title"</a> above.</p>
-    <p style="margin-top:12px"><a href="admin.html" style="color:var(--mute);font-size:.75rem">Author Portal 🔒</a></p>
+    <p><strong>RONINLIFE</strong> — Curated archive of literature, original writing, and cinema.</p>
+    <p>Have a recommendation? <a href="#" onclick="openSuggestModal();return false">Suggest a Title</a>.</p>
+    <p style="margin-top:12px"><a href="admin.html" style="color:var(--mute);font-size:.75rem">Author Portal</a></p>
   </footer>
 
   <!-- Details Sheet Modal -->
@@ -53,18 +53,18 @@
   <div class="modal" id="suggestModal">
     <div class="form-sheet">
       <button class="btn ghost x" onclick="closeSuggestModal()">✕</button>
-      <h2>💡 Suggest a Title</h2>
-      <p class="desc">Have a mind-bending book, indie film, or story you think belongs in Ronin's Vault? Submit your recommendation directly to the author!</p>
+      <h2>Suggest a Title</h2>
+      <p class="desc">Recommend a book, essay, or cinematic work for inclusion in the curated archive.</p>
 
       <form id="suggestForm" onsubmit="handleSuggestSubmit(event)">
         <div class="form-grid">
           <div class="form-group">
             <label for="sType">Category</label>
             <select id="sType">
-              <option value="Book">📚 Book</option>
-              <option value="Short Story">✒️ Short Story / Article</option>
-              <option value="Film">🎬 Film / Shortfilm</option>
-              <option value="Series">📺 TV / Web Series</option>
+              <option value="Book">Book</option>
+              <option value="Short Story">Short Story / Article</option>
+              <option value="Film">Film / Cinema</option>
+              <option value="Series">Television / Series</option>
             </select>
           </div>
 
@@ -80,24 +80,24 @@
 
           <div class="form-group">
             <label for="sYourName">Your Name / Handle (Optional)</label>
-            <input id="sYourName" type="text" placeholder="Anonymous or Twitter handle">
+            <input id="sYourName" type="text" placeholder="Name or handle">
           </div>
 
           <div class="form-group full">
-            <label for="sLink">Link / Reference (Optional)</label>
-            <input id="sLink" type="url" placeholder="Goodreads, trailer link, or article...">
+            <label for="sLink">Reference Link (Optional)</label>
+            <input id="sLink" type="url" placeholder="Goodreads, trailer, or article link...">
           </div>
 
           <div class="form-group full">
-            <label for="sNotes">Why should the author check it out? *</label>
-            <textarea id="sNotes" rows="3" placeholder="What makes this story or film unforgettable? Why does it belong in the vault?" required></textarea>
+            <label for="sNotes">Why does this belong in the archive? *</label>
+            <textarea id="sNotes" rows="3" placeholder="What makes this work memorable? Share your notes..." required></textarea>
           </div>
         </div>
 
         <div class="form-btns">
           <button type="button" class="btn ghost" onclick="closeSuggestModal()">Cancel</button>
-          <button type="button" class="btn ghost" onclick="copySuggestionText()">📋 Copy Recommendation</button>
-          <button type="submit" class="btn primary">🚀 Submit Recommendation</button>
+          <button type="button" class="btn ghost" onclick="copySuggestionText()">Copy Details</button>
+          <button type="submit" class="btn primary">Submit Recommendation</button>
         </div>
       </form>
     </div>

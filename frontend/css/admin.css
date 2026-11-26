@@ -308,6 +308,23 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
   margin-right: 10px;
 }
 
+.item-thumb-ph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 60px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--mute);
+  font-size: .75rem;
+  font-weight: 700;
+  vertical-align: middle;
+  margin-right: 10px;
+  letter-spacing: .05em;
+}
+
 /* Suggestions Cards */
 .sug-card {
   background: var(--panel);

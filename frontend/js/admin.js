@@ -72,7 +72,7 @@ async function handleLogin(e) {
       store.set("author_admin_token", authToken);
       showDashboardView();
       loadDashboardData();
-      showToast("👑 Logged in as Author Admin");
+      showToast("Authenticated as Author");
     } else {
       alert(data.error || "Incorrect password.");
     }
@@ -165,7 +165,7 @@ function renderItemsTable() {
   }
 
   tbody.innerHTML = currentLibrary.map(item => {
-    const thumb = item.poster ? `<img class="item-thumb" src="${esc(item.poster)}" alt="">` : `<span style="font-size:1.5rem;margin-right:8px">📖</span>`;
+    const thumb = item.poster ? `<img class="item-thumb" src="${esc(item.poster)}" alt="">` : `<span class="item-thumb-ph">${esc((item.type || 'IT').slice(0, 2).toUpperCase())}</span>`;
     return `
       <tr>
         <td>
@@ -179,8 +179,8 @@ function renderItemsTable() {
         </td>
         <td><span style="text-transform:uppercase;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,0.06)">${esc(item.type)}</span></td>
         <td>${esc(item.date)}</td>
-        <td>★ ${Number(item.rating || 0).toFixed(1)}</td>
-        <td>${item.isAuthorPick ? '<span style="color:var(--gold);font-weight:700">★ Author Pick</span>' : '<span style="color:var(--mute)">Standard</span>'}</td>
+        <td>${Number(item.rating || 0).toFixed(1)}</td>
+        <td>${item.isAuthorPick ? '<span style="color:var(--gold);font-weight:600">Curator Pick</span>' : '<span style="color:var(--mute)">Standard</span>'}</td>
         <td>
           <button class="btn ghost" style="padding:4px 12px;font-size:.75rem;color:#fca5a5;border-color:rgba(255,90,54,0.3)" onclick="deleteItem('${item.id}')">Delete</button>
         </td>
@@ -204,7 +204,7 @@ function renderSuggestions() {
       </div>
       <div class="meta">Creator: <strong>${esc(s.creator)}</strong> · Recommended by: <strong>${esc(s.by)}</strong></div>
       <p>${esc(s.notes)}</p>
-      ${s.link ? `<p><a href="${esc(s.link)}" target="_blank" rel="noopener" style="color:var(--cyan);font-size:.85rem">🔗 View Submitted Link ↗</a></p>` : ''}
+      ${s.link ? `<p><a href="${esc(s.link)}" target="_blank" rel="noopener" style="color:var(--cyan);font-size:.85rem">View Reference Link ↗</a></p>` : ''}
       <div style="display:flex;gap:10px">
         <button class="btn primary" style="padding:6px 14px;font-size:.78rem" onclick="adoptSuggestionById('${s.id}')">Publish to Vault</button>
         <button class="btn ghost" style="padding:6px 14px;font-size:.78rem;color:#fca5a5" onclick="dismissSuggestion('${s.id}')">Dismiss</button>
@@ -256,7 +256,7 @@ async function handlePublishSubmit(e) {
       await loadLibrary();
       updateStats();
       switchTab('tabItems');
-      showToast(`✨ Published "${title}" to Vault!`);
+      showToast(`Published "${title}" to Vault.`);
     } else {
       alert(data.error || "Failed to publish item.");
     }
@@ -264,7 +264,7 @@ async function handlePublishSubmit(e) {
     alert("Network error connecting to backend.");
   } finally {
     btn.disabled = false;
-    btn.textContent = "🚀 Publish to Vault";
+    btn.textContent = "Publish to Vault";
   }
 }
 

@@ -494,17 +494,31 @@ section.row {
   justify-content: center;
   align-items: center;
   height: 100%;
-  padding: 16px;
+  padding: 20px 16px;
   text-align: center;
-  font: 700 1rem var(--display);
-  background: linear-gradient(160deg, #2a2150, #14101f);
+  background: linear-gradient(160deg, #1b172a, #0c0a14);
   color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card .ph .ph-type {
+  font-size: .6rem;
+  letter-spacing: .14em;
+  color: var(--gold);
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.card .ph .ph-title {
+  font: 700 1.05rem var(--display);
+  line-height: 1.25;
+  margin-bottom: 6px;
 }
 
 .card .ph .ph-sub {
   font-size: .75rem;
   color: var(--mute);
-  margin-top: 6px;
+  margin-top: 4px;
   font-weight: 400;
 }
 
@@ -513,17 +527,20 @@ section.row {
   position: absolute;
   padding: 3px 8px;
   border-radius: 99px;
-  font-size: .7rem;
-  font-weight: 700;
-  backdrop-filter: blur(8px);
+  font-size: .68rem;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
   z-index: 3;
 }
 
 .rate {
   left: 8px;
   top: 8px;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(7, 6, 12, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
 }
 
 .new {
@@ -534,55 +551,59 @@ section.row {
 
 .heart {
   left: 8px;
-  top: 34px;
-  background: #ff2e7e;
+  top: 32px;
+  background: rgba(123, 92, 255, 0.9);
   color: #fff;
-  font-size: .8rem;
+  font-size: .6rem;
+  letter-spacing: .08em;
+  font-weight: 700;
 }
 
 .type-pill {
   right: 8px;
   bottom: 8px;
-  background: rgba(7, 6, 12, 0.8);
+  background: rgba(7, 6, 12, 0.82);
   color: var(--ink);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  font-size: .62rem;
-  letter-spacing: .05em;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  font-size: .6rem;
+  letter-spacing: .08em;
   text-transform: uppercase;
+  font-weight: 600;
 }
 
 .type-pill.book {
-  border-color: var(--emerald);
+  border-color: rgba(110, 231, 183, 0.35);
   color: #6ee7b7;
 }
 
 .type-pill.story {
-  border-color: #a855f7;
+  border-color: rgba(216, 180, 254, 0.35);
   color: #d8b4fe;
 }
 
 .type-pill.movie {
-  border-color: var(--ember);
+  border-color: rgba(253, 186, 116, 0.35);
   color: #fdba74;
 }
 
 .type-pill.tv {
-  border-color: var(--cyan);
+  border-color: rgba(103, 232, 249, 0.35);
   color: #67e8f9;
 }
 
 .pick-pill {
   left: 8px;
   top: 8px;
-  background: linear-gradient(135deg, var(--gold), var(--ember));
-  color: #07060c;
-  font-weight: 800;
-  letter-spacing: .04em;
-  box-shadow: 0 4px 12px rgba(255, 200, 87, 0.4);
+  background: rgba(235, 180, 56, 0.22);
+  border: 1px solid rgba(235, 180, 56, 0.5);
+  color: var(--gold);
+  font-weight: 700;
+  font-size: .62rem;
+  letter-spacing: .08em;
 }
 
-.card.has-pick .rate { top: 34px; }
-.card.has-pick .heart { top: 60px; }
+.card.has-pick .rate { top: 32px; }
+.card.has-pick .heart { top: 56px; }
 
 .info {
   position: absolute;
