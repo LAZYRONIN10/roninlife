@@ -102,6 +102,11 @@ async function initDb() {
           expires_at TIMESTAMPTZ NOT NULL,
           created_at TIMESTAMPTZ DEFAULT NOW()
         );
+
+        CREATE TABLE IF NOT EXISTS system_settings (
+          key VARCHAR(50) PRIMARY KEY,
+          value TEXT NOT NULL
+        );
       `);
 
       // 2. Seed default author user if empty
@@ -117,34 +122,38 @@ async function initDb() {
         console.log('✅ Seeded default author account in Neon PostgreSQL (username: author)');
       }
 
-      // 3. Seed library items from JSON if empty
-      const itemCountRes = await client.query('SELECT COUNT(*) FROM library_items;');
-      if (parseInt(itemCountRes.rows[0].count, 10) === 0) {
-        const initialItems = readJson(LIBRARY_FILE, []);
-        for (const it of initialItems) {
-          await client.query(
-            `INSERT INTO library_items 
-             (id, type, title, creator, date, rating, is_author_pick, poster, back, genres, overview, url, full_text)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-             ON CONFLICT (id) DO NOTHING;`,
-            [
-              it.id,
-              it.type,
-              it.title,
-              it.creator || '',
-              it.date || '',
-              it.rating || 9.5,
-              Boolean(it.isAuthorPick),
-              it.poster || '',
-              it.back || it.poster || '',
-              JSON.stringify(Array.isArray(it.g) ? it.g : []),
-              it.ov || '',
-              it.url || '',
-              it.fullText || ''
-            ]
-          );
+      // 3. Seed library items from JSON only once on initial setup
+      const seedCheck = await client.query("SELECT value FROM system_settings WHERE key = 'seed_completed';");
+      if (seedCheck.rows.length === 0) {
+        const itemCountRes = await client.query('SELECT COUNT(*) FROM library_items;');
+        if (parseInt(itemCountRes.rows[0].count, 10) === 0) {
+          const initialItems = readJson(LIBRARY_FILE, []);
+          for (const it of initialItems) {
+            await client.query(
+              `INSERT INTO library_items 
+               (id, type, title, creator, date, rating, is_author_pick, poster, back, genres, overview, url, full_text)
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+               ON CONFLICT (id) DO NOTHING;`,
+              [
+                it.id,
+                it.type,
+                it.title,
+                it.creator || '',
+                it.date || '',
+                it.rating || 9.5,
+                Boolean(it.isAuthorPick),
+                it.poster || '',
+                it.back || it.poster || '',
+                JSON.stringify(Array.isArray(it.g) ? it.g : []),
+                it.ov || '',
+                it.url || '',
+                it.fullText || ''
+              ]
+            );
+          }
+          console.log(`✅ Initial vault titles seeded into Neon PostgreSQL`);
         }
-        console.log(`✅ Seeded ${initialItems.length} vault titles into Neon PostgreSQL`);
+        await client.query("INSERT INTO system_settings (key, value) VALUES ('seed_completed', 'true') ON CONFLICT DO NOTHING;");
       }
 
       isConnected = true;
