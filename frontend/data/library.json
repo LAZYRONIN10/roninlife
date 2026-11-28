@@ -1,1 +1,36 @@
-[]
+[
+  {
+    "id": "movie_1795889992534",
+    "type": "movie",
+    "title": "Fight Club",
+    "creator": "Chuck Palahniuk and  David Fincher",
+    "date": "2h 19m",
+    "rating": 7.9,
+    "isAuthorPick": true,
+    "poster": "https://ik.imagekit.io/nflbrzcoi/roninlife-fightclub.jpg?updatedAt=1795889469540",
+    "back": "https://ik.imagekit.io/nflbrzcoi/roninlife-fightclub.jpg?updatedAt=1795889469540",
+    "g": [
+      "Action/Crime"
+    ],
+    "ov": "Fight Club is a journey into the fractured human mind, where dissatisfaction with life turns into rebellion against everything society teaches us to value. Through violence, chaos and an increasingly unstable sense of identity, it questions whether we truly control our lives or are simply prisoners of the identities we've constructed for ourselves.",
+    "url": "https://www.youtube.com/watch?v=SUXWAEX2jlg",
+    "fullText": ""
+  },
+  {
+    "id": "movie_1795717045866",
+    "type": "movie",
+    "title": "Salaar",
+    "creator": "Prashanth Neel",
+    "date": "2h 55m",
+    "rating": 7.8,
+    "isAuthorPick": true,
+    "poster": "https://ik.imagekit.io/nflbrzcoi/1ronin-Salaar.jpeg?updatedAt=1795716882378",
+    "back": "https://ik.imagekit.io/nflbrzcoi/1ronin-Salaar.jpeg?updatedAt=1795716882378",
+    "g": [
+      "Action/Thriller"
+    ],
+    "ov": "It have one of the crazy world building in recent indian films, it has good drama and action in a good balance. it is a perfect fan movie that remains with in hearts for long time.",
+    "url": "https://youtu.be/4GPvYMKtrtI?si=LdlJRuj_aDUAb6z9",
+    "fullText": ""
+  }
+]

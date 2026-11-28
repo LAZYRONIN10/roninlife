@@ -62,6 +62,9 @@ function serveStaticFile(res, filePath) {
       const ext = path.extname(filePath).toLowerCase();
       const contentType = MIME_TYPES[ext] || 'application/octet-stream';
       setCors(res);
+      if (ext === '.png' || ext === '.ico' || ext === '.svg') {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      }
       res.writeHead(200, { 'Content-Type': contentType });
       return fs.createReadStream(filePath).pipe(res);
     }
@@ -121,6 +124,11 @@ const server = http.createServer(async (req, res) => {
   // Dedicated Author Admin Portal
   if (pathname === '/admin' || pathname === '/admin.html') {
     return serveStaticFile(res, path.join(FRONTEND_DIR, 'admin.html'));
+  }
+
+  // Favicon PNG handler
+  if (pathname === '/favicon.png') {
+    return serveStaticFile(res, path.join(FRONTEND_DIR, 'favicon.png'));
   }
 
   // Favicon Fallback Handler

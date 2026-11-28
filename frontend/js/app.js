@@ -15,6 +15,8 @@ let db = {};
 let heroItems = [];
 let heroI = 0;
 let heroTimer;
+let showcaseItems = [];
+let showcaseIndex = 0;
 let filter = { t: "all", g: "all", authorOnly: false };
 let view = "home";
 let list = store.get("ronin_favs", {});
@@ -113,7 +115,12 @@ function card(it) {
 }
 
 function filters() {
-  return `<div class="chips">${CHIPS.map(([v, l]) => `<button class="chip ${(v === filter.t || v === filter.g || (v === "author" && filter.authorOnly)) ? "on" : ""}" data-v="${v}">${l}</button>`).join("")}</div>`;
+  const knownTypes = new Set(CHIPS.map(([v]) => v));
+  const dynamicTypes = [...new Set(vaultLibrary.map(it => String(it.type || "").toLowerCase()).filter(Boolean))]
+    .filter(type => !knownTypes.has(type));
+  const allChips = CHIPS.map(([v, l]) => [v, l]);
+  dynamicTypes.forEach(type => allChips.push([type, categoryLabel(type)]));
+  return `<div class="chips">${allChips.map(([v, l]) => `<button class="chip ${(v === filter.t || v === filter.g || (v === "author" && filter.authorOnly)) ? "on" : ""}" data-v="${v}">${l}</button>`).join("")}</div>`;
 }
 
 function authorBanner() {
@@ -144,7 +151,7 @@ async function load() {
   heroItems = authorPicks.length ? authorPicks.slice(0, 5) : all.slice(0, 5);
   heroI = 0;
 
-  let html = `<div class="hero"></div>`;
+  let html = `<div class="hero top10-showcase"></div>`;
   html += authorBanner();
   html += filters();
 
@@ -166,15 +173,8 @@ async function load() {
   </div>`;
 
   $("#main").innerHTML = html;
-  drawHero();
-
   clearInterval(heroTimer);
-  heroTimer = setInterval(() => {
-    if (heroItems.length) {
-      heroI = (heroI + 1) % heroItems.length;
-      drawHero();
-    }
-  }, 8000);
+  drawTopTen();
 
   $("#upd").textContent = `VAULT READY (${all.length} TITLES)`;
 }
@@ -226,6 +226,9 @@ function applyFilter() {
     const isGenre = v === filter.g;
     c.classList.toggle("on", isAuthor || (filter.t !== "all" && isType) || (filter.g !== "all" && isGenre) || (v === "all" && filter.t === "all" && filter.g === "all" && !filter.authorOnly));
   });
+
+  showcaseIndex = 0;
+  drawTopTen();
 }
 
 function setChipFilter(v) {
@@ -234,6 +237,8 @@ function setChipFilter(v) {
   } else if (v === "author") {
     filter = { t: "all", g: "all", authorOnly: true };
   } else if (["book", "story", "movie", "tv"].includes(v)) {
+    filter = { t: v, g: "all", authorOnly: false };
+  } else if (vaultLibrary.some(it => String(it.type || "").toLowerCase() === v)) {
     filter = { t: v, g: "all", authorOnly: false };
   } else {
     filter = { t: "all", g: v, authorOnly: false };
@@ -419,8 +424,12 @@ main.addEventListener("click", e => {
   const o = t.closest("[data-open]");
   const f = t.closest("[data-fav]");
   const h = t.closest("[data-h]");
+  const showcaseCard = t.closest("[data-showcase-index]");
 
-  if (s) {
+  if (showcaseCard) {
+    showcaseIndex = Number(showcaseCard.dataset.showcaseIndex);
+    drawTopTen();
+  } else if (s) {
     const tr = s.closest("section").querySelector(".track");
     tr.scrollBy({ left: +s.dataset.s * tr.clientWidth * .8, behavior: "smooth" });
   } else if (ch) {
@@ -532,3 +541,130 @@ addEventListener("mousemove", e => {
 
 // Launch
 load();
+
+function rankedTopTen(items) {
+  return [...items].sort((a, b) => {
+    if (Boolean(b.isAuthorPick) !== Boolean(a.isAuthorPick)) return b.isAuthorPick ? 1 : -1;
+    const ar = Number(a.rating) || 0;
+    const br = Number(b.rating) || 0;
+    return br - ar;
+  }).slice(0, 10);
+}
+
+function getShowcaseItems() {
+  return rankedTopTen(vaultLibrary.filter(it => {
+    if (filter.authorOnly && !it.isAuthorPick) return false;
+    if (filter.t !== "all" && it.type !== filter.t) return false;
+    const genres = Array.isArray(it.g) ? it.g.join(" ").toLowerCase() : "";
+    if (filter.g !== "all" && !genres.includes(filter.g.toLowerCase())) return false;
+    return true;
+  }));
+}
+
+function firstField(it, names) {
+  for (const name of names) {
+    if (it[name] !== undefined && it[name] !== null && String(it[name]).trim()) return String(it[name]).trim();
+  }
+  return "";
+}
+
+function categoryLabel(type) {
+  const labels = {
+    book: "Book", story: "Short Story", movie: "Film", tv: "TV Series"
+  };
+  if (labels[type]) return labels[type];
+  return type ? String(type).replace(/[-_]+/g, " ").replace(/\b\w/g, c => c.toUpperCase()) : "Content";
+}
+
+function showcaseMetadata(it) {
+  const type = String(it.type || "").toLowerCase();
+  const date = firstField(it, ["date", "year", "releaseYear", "publicationYear"]);
+  const status = firstField(it, ["status", "releaseStatus"]);
+  const meta = [];
+
+  if (["movie", "film", "cinema"].includes(type)) {
+    const year = firstField(it, ["year", "releaseYear", "publishedYear"]) || date.match(/\b(18|19|20|21)\d{2}\b/)?.[0] || "";
+    const runtime = firstField(it, ["runtime", "duration"]) || (/(\d+\s*(h|hr|hour|min|minute))/i.test(date) ? date : "");
+    if (year) meta.push(year);
+    if (runtime) meta.push(runtime);
+  } else if (["tv", "series", "television"].includes(type)) {
+    const year = firstField(it, ["year", "releaseYear"]) || date.match(/\b(18|19|20|21)\d{2}\b/)?.[0] || "";
+    const seasons = firstField(it, ["seasons", "seasonCount", "season"]);
+    if (year) meta.push(year);
+    if (seasons) meta.push(/season/i.test(seasons) ? seasons : `${seasons} Seasons`);
+  } else if (["book", "novel"].includes(type)) {
+    const year = firstField(it, ["year", "publicationYear", "publishYear"]) || date.match(/\b(18|19|20|21)\d{2}\b/)?.[0] || "";
+    const pages = firstField(it, ["pages", "pageCount"]);
+    if (year) meta.push(year);
+    if (pages) meta.push(/pages?/i.test(pages) ? pages : `${pages} Pages`);
+  } else if (["story", "article", "essay"].includes(type)) {
+    const readTime = firstField(it, ["duration", "runtime", "readTime"]) || (/(min|minute|read)/i.test(date) ? date : "");
+    if (readTime) meta.push(readTime);
+  } else if (["game", "gaming", "video_game"].includes(type)) {
+    const year = firstField(it, ["year", "releaseYear"]) || date.match(/\b(18|19|20|21)\d{2}\b/)?.[0] || "";
+    const platform = firstField(it, ["platform", "platforms"]);
+    if (year) meta.push(year);
+    if (platform) meta.push(platform);
+  } else {
+    const year = firstField(it, ["year", "releaseYear", "publicationYear"]) || date.match(/\b(18|19|20|21)\d{2}\b/)?.[0] || "";
+    if (year) meta.push(year);
+  }
+
+  if (status) meta.push(status);
+  const genres = Array.isArray(it.g) ? it.g : [];
+  if (genres.length) meta.push(genres.slice(0, 2).join(" · "));
+  return [...new Set(meta)].filter(Boolean);
+}
+
+function drawTopTen() {
+  const h = document.querySelector(".top10-showcase");
+  if (!h) return;
+
+  showcaseItems = getShowcaseItems();
+  if (!showcaseItems.length) {
+    h.innerHTML = `<div class="top10-empty"><span>TOP 10</span><h1>No titles in this selection</h1><p>Try another category or curator filter.</p></div>`;
+    return;
+  }
+
+  if (showcaseIndex >= showcaseItems.length) showcaseIndex = 0;
+  const it = showcaseItems[showcaseIndex];
+  const k = it.type + ":" + it.id;
+  const bgImg = it.back || it.poster || "";
+  const metadata = showcaseMetadata(it);
+  const creator = it.creator ? esc(it.creator) : "";
+  const category = categoryLabel(it.type);
+
+  h.innerHTML = `<div class="top10-layout">
+    <article class="top10-feature">
+      ${bgImg ? `<div class="top10-feature-bg" style="background-image:url(${esc(bgImg)})"></div>` : `<div class="top10-feature-bg top10-feature-placeholder"></div>`}
+      <div class="top10-feature-shade"></div>
+      <div class="top10-feature-content">
+        <span class="top10-status"><i></i> Top 10 · ${esc(category)}</span>
+        <div class="top10-meta">${esc(category)}${metadata.length ? ` <b>·</b> ${metadata.map(esc).join(" <b>·</b> ")}` : ""}</div>
+        <h1>${esc(it.title)}</h1>
+        ${creator ? `<p class="top10-creator">${creator}</p>` : ""}
+        <p class="top10-description">${esc(it.ov || "No description available.")}</p>
+        <div class="top10-actions">
+          <button class="top10-btn top10-primary" data-open="${k}"><span class="play-icon"></span> Explore</button>
+          <button class="top10-btn top10-secondary" data-open="${k}"><span class="info-icon">i</span> Details</button>
+          <button class="top10-btn top10-save" data-fav="${k}" aria-label="Add to saved list">${list[k] ? "✓" : "+"}</button>
+        </div>
+      </div>
+    </article>
+
+    <div class="top10-rail" aria-label="Top 10 rankings">
+      ${showcaseItems.slice(1).map((item, railI) => {
+        const rank = showcaseItems.indexOf(item) + 1;
+        const image = item.poster || item.back || "";
+        const selected = showcaseIndex === rank - 1;
+        return `<button class="top10-card ${selected ? "selected" : ""}" data-showcase-index="${rank - 1}" aria-label="Rank ${rank}: ${esc(item.title)}">
+          ${image ? `<img src="${esc(image)}" alt="${esc(item.title)}" loading="lazy">` : `<span class="top10-card-fallback">${esc(categoryLabel(item.type))}</span>`}
+          <span class="top10-card-shade"></span>
+          <span class="top10-rank">${rank}</span>
+        </button>`;
+      }).join("")}
+    </div>
+  </div>`;
+
+  $("#amb").style.backgroundImage = bgImg ? `url(${esc(bgImg)})` : "";
+}
