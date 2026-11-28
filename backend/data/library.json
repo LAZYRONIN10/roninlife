@@ -1,9 +1,26 @@
 [
   {
+    "id": "movie_1795893102919",
+    "type": "movie",
+    "title": "Batman Begins",
+    "creator": "Christopher Nolan[ Director ] and David S. Goyer[ Writer ]",
+    "date": "2h 20m",
+    "rating": 8.2,
+    "isAuthorPick": true,
+    "poster": "https://ik.imagekit.io/nflbrzcoi/roninlife-batman%20begins%20(1).png?updatedAt=1795892927391",
+    "back": "https://ik.imagekit.io/nflbrzcoi/roninlife-batman%20begins%20(1).png?updatedAt=1795892927391",
+    "g": [
+      "Action/Crime"
+    ],
+    "ov": "Batman Begins is not merely the story of a man becoming a hero; it is the story of a man confronting his own demons and turning his greatest fear into his greatest weapon. In a city where corruption has become ordinary and justice has lost its meaning, Bruce Wayne creates an identity that exists between fear and hope. But beneath the mask lies a constant struggle between vengeance, morality and the responsibility that comes with power.",
+    "url": "https://youtu.be/vak9ZLfhGnQ?si=ttiaArN5EHpFXoR8",
+    "fullText": ""
+  },
+  {
     "id": "movie_1795889992534",
     "type": "movie",
     "title": "Fight Club",
-    "creator": "Chuck Palahniuk and  David Fincher",
+    "creator": "David Fincher[Director] and Chuck Palahniuk[Writer] ",
     "date": "2h 19m",
     "rating": 7.9,
     "isAuthorPick": true,

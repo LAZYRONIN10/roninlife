@@ -17,6 +17,8 @@ let heroI = 0;
 let heroTimer;
 let showcaseItems = [];
 let showcaseIndex = 0;
+let showcaseTimer = null;
+let showcasePaused = false;
 let filter = { t: "all", g: "all", authorOnly: false };
 let view = "home";
 let list = store.get("ronin_favs", {});
@@ -174,7 +176,7 @@ async function load() {
 
   $("#main").innerHTML = html;
   clearInterval(heroTimer);
-  drawTopTen();
+  drawTopTen(true);
 
   $("#upd").textContent = `VAULT READY (${all.length} TITLES)`;
 }
@@ -228,7 +230,7 @@ function applyFilter() {
   });
 
   showcaseIndex = 0;
-  drawTopTen();
+  drawTopTen(true);
 }
 
 function setChipFilter(v) {
@@ -427,8 +429,7 @@ main.addEventListener("click", e => {
   const showcaseCard = t.closest("[data-showcase-index]");
 
   if (showcaseCard) {
-    showcaseIndex = Number(showcaseCard.dataset.showcaseIndex);
-    drawTopTen();
+    selectTopTen(Number(showcaseCard.dataset.showcaseIndex));
   } else if (s) {
     const tr = s.closest("section").querySelector(".track");
     tr.scrollBy({ left: +s.dataset.s * tr.clientWidth * .8, behavior: "smooth" });
@@ -616,12 +617,46 @@ function showcaseMetadata(it) {
   return [...new Set(meta)].filter(Boolean);
 }
 
-function drawTopTen() {
+function posterCard(item, index) {
+  const rank = index + 1;
+  const image = item.poster || item.back || "";
+  return `<button class="top10-card" data-showcase-index="${index}" aria-label="Rank ${rank}: ${esc(item.title)}">
+    ${image ? `<img src="${esc(image)}" alt="${esc(item.title)}" loading="lazy">` : `<span class="top10-card-fallback">${esc(categoryLabel(item.type))}</span>`}
+    <span class="top10-card-shade"></span>
+    <span class="top10-rank">${rank}</span>
+  </button>`;
+}
+
+function startShowcaseTimer(reset = false) {
+  if (reset) clearTimeout(showcaseTimer);
+  if (showcaseTimer && !reset) return;
+
+  clearTimeout(showcaseTimer);
+  showcaseTimer = setTimeout(() => {
+    showcaseTimer = null;
+    if (!showcasePaused && showcaseItems.length) {
+      showcaseIndex = (showcaseIndex + 1) % showcaseItems.length;
+      drawTopTen(false);
+    }
+    startShowcaseTimer(true);
+  }, 5000);
+}
+
+function selectTopTen(index) {
+  if (!showcaseItems.length) return;
+  showcaseIndex = ((Number(index) % showcaseItems.length) + showcaseItems.length) % showcaseItems.length;
+  drawTopTen(false);
+  startShowcaseTimer(true);
+}
+
+function drawTopTen(resetTimer = false) {
   const h = document.querySelector(".top10-showcase");
   if (!h) return;
 
   showcaseItems = getShowcaseItems();
   if (!showcaseItems.length) {
+    clearTimeout(showcaseTimer);
+    showcaseTimer = null;
     h.innerHTML = `<div class="top10-empty"><span>TOP 10</span><h1>No titles in this selection</h1><p>Try another category or curator filter.</p></div>`;
     return;
   }
@@ -633,8 +668,13 @@ function drawTopTen() {
   const metadata = showcaseMetadata(it);
   const creator = it.creator ? esc(it.creator) : "";
   const category = categoryLabel(it.type);
+  const leftItems = showcaseItems.slice(0, showcaseIndex);
+  const rightItems = showcaseItems.slice(showcaseIndex + 1);
+  const positionClass = showcaseIndex === 0 ? "feature-left" : showcaseIndex === showcaseItems.length - 1 ? "feature-right" : "feature-middle";
 
-  h.innerHTML = `<div class="top10-layout">
+  h.innerHTML = `<div class="top10-layout ${positionClass}">
+    ${leftItems.length ? `<div class="top10-rail top10-rail-left" aria-label="Ranks before the featured item">${leftItems.map((item, i) => posterCard(item, i)).join("")}</div>` : ""}
+
     <article class="top10-feature">
       ${bgImg ? `<div class="top10-feature-bg" style="background-image:url(${esc(bgImg)})"></div>` : `<div class="top10-feature-bg top10-feature-placeholder"></div>`}
       <div class="top10-feature-shade"></div>
@@ -652,19 +692,12 @@ function drawTopTen() {
       </div>
     </article>
 
-    <div class="top10-rail" aria-label="Top 10 rankings">
-      ${showcaseItems.slice(1).map((item, railI) => {
-        const rank = showcaseItems.indexOf(item) + 1;
-        const image = item.poster || item.back || "";
-        const selected = showcaseIndex === rank - 1;
-        return `<button class="top10-card ${selected ? "selected" : ""}" data-showcase-index="${rank - 1}" aria-label="Rank ${rank}: ${esc(item.title)}">
-          ${image ? `<img src="${esc(image)}" alt="${esc(item.title)}" loading="lazy">` : `<span class="top10-card-fallback">${esc(categoryLabel(item.type))}</span>`}
-          <span class="top10-card-shade"></span>
-          <span class="top10-rank">${rank}</span>
-        </button>`;
-      }).join("")}
-    </div>
+    ${rightItems.length ? `<div class="top10-rail top10-rail-right" aria-label="Ranks after the featured item">${rightItems.map((item, i) => posterCard(item, showcaseIndex + i + 1)).join("")}</div>` : ""}
   </div>`;
 
+  h.onmouseenter = () => { showcasePaused = true; };
+  h.onmouseleave = () => { showcasePaused = false; startShowcaseTimer(true); };
   $("#amb").style.backgroundImage = bgImg ? `url(${esc(bgImg)})` : "";
+
+  if (resetTimer) startShowcaseTimer(true);
 }
