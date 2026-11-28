@@ -23,6 +23,12 @@ let filter = { t: "all", g: "all", authorOnly: false };
 let view = "home";
 let list = store.get("ronin_favs", {});
 let st;
+let discoveryExclusions = new Map();
+let discoveryExclusionOrder = 0;
+let discoveryLastKey = "";
+let discoverySpinTimer = null;
+let discoverySelectedGenres = new Set();
+let discoverySurpriseMode = false;
 
 const CHIPS = [
   ["all", "All"],
@@ -427,8 +433,25 @@ main.addEventListener("click", e => {
   const f = t.closest("[data-fav]");
   const h = t.closest("[data-h]");
   const showcaseCard = t.closest("[data-showcase-index]");
+  const discoveryGenre = t.closest("[data-discovery-genre]");
+  const notInterested = t.closest("[data-not-interested]");
 
-  if (showcaseCard) {
+  if (discoveryGenre) {
+    const genre = discoveryGenre.dataset.discoveryGenre;
+    if (discoverySelectedGenres.has(genre)) discoverySelectedGenres.delete(genre);
+    else discoverySelectedGenres.add(genre);
+    discoveryGenre.classList.toggle("on", discoverySelectedGenres.has(genre));
+  } else if (t.id === "discoverySpin") {
+    spinDiscovery(false);
+  } else if (t.id === "discoverySurprise") {
+    spinDiscovery(true);
+  } else if (t.id === "discoveryClear" || t.id === "discoveryClearEmpty") {
+    clearDiscoveryFilters();
+  } else if (t.id === "discoveryTryAgain") {
+    spinDiscovery(discoverySurpriseMode);
+  } else if (notInterested) {
+    markDiscoveryNotInterested(notInterested.dataset.notInterested);
+  } else if (showcaseCard) {
     selectTopTen(Number(showcaseCard.dataset.showcaseIndex));
   } else if (s) {
     const tr = s.closest("section").querySelector(".track");
@@ -707,4 +730,305 @@ function drawTopTen(resetTimer = false) {
   $("#amb").style.backgroundImage = bgImg ? `url(${esc(bgImg)})` : "";
 
   if (resetTimer) startShowcaseTimer(true);
+}
+
+/* ==========================================================================
+   DISCOVERY ROULETTE
+   ========================================================================== */
+
+function resetDiscoverySession() {
+  discoveryExclusions = new Map();
+  discoveryExclusionOrder = 0;
+  discoveryLastKey = "";
+  discoverySelectedGenres = new Set();
+  discoverySurpriseMode = false;
+}
+
+function openDiscovery() {
+  clearInterval(heroTimer);
+  clearTimeout(showcaseTimer);
+  resetDiscoverySession();
+  view = "discovery";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  renderDiscovery();
+}
+
+function discoveryCategoryLabel(type) {
+  const labels = { book: "Books", story: "Short Stories", movie: "Movies", film: "Movies", tv: "TV Series", series: "TV Series", anime: "Anime", game: "Games", gaming: "Games" };
+  const key = String(type || "").toLowerCase();
+  return labels[key] || categoryLabel(type) + "s";
+}
+
+function renderDiscovery() {
+  const categories = [...new Set(vaultLibrary.map(it => String(it.type || "").toLowerCase()).filter(Boolean))];
+  const genres = [...new Set(vaultLibrary.flatMap(it => Array.isArray(it.g) ? it.g : [])
+    .flatMap(value => String(value).split(/[\/,&]/))
+    .map(value => value.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+
+  $("#main").innerHTML = `<section class="discovery-page">
+    <div class="discovery-heading">
+      <div>
+        <span class="discovery-eyebrow">DISCOVERY ENGINE</span>
+        <h1>The Discovery <em>Roulette</em></h1>
+        <p>Choose as much or as little as you want. Every spin works.</p>
+      </div>
+      <button class="btn ghost" onclick="home()">← Back to Vault</button>
+    </div>
+
+    <div class="discovery-shell">
+      <div class="discovery-controls">
+        <div class="discovery-control-grid">
+          <label class="discovery-field">
+            <span>Category</span>
+            <select id="discoveryCategory">
+              <option value="">All categories</option>
+              ${categories.map(type => `<option value="${esc(type)}">${esc(discoveryCategoryLabel(type))}</option>`).join("")}
+            </select>
+          </label>
+
+          <label class="discovery-field">
+            <span>Minimum rating</span>
+            <select id="discoveryRating">
+              <option value="">Any rating</option>
+              <option value="5">5+</option>
+              <option value="6">6+</option>
+              <option value="7">7+</option>
+              <option value="8">8+</option>
+              <option value="9">9+</option>
+            </select>
+          </label>
+
+          <label class="discovery-field">
+            <span>Duration</span>
+            <select id="discoveryDuration">
+              <option value="">Any duration</option>
+              <option value="under30">Under 30 minutes</option>
+              <option value="30to60">30–60 minutes</option>
+              <option value="1to2">1–2 hours</option>
+              <option value="2to3">2–3 hours</option>
+              <option value="over3">More than 3 hours</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="discovery-genres">
+          <div class="discovery-genres-title"><span>Genres</span><small>Choose one or more</small></div>
+          <div id="discoveryGenreChips" class="discovery-genre-chips">
+            ${genres.map(genre => `<button type="button" class="discovery-genre-chip" data-discovery-genre="${esc(genre)}">${esc(genre)}</button>`).join("")}
+          </div>
+        </div>
+
+        <div class="discovery-actions">
+          <button type="button" class="discovery-spin" id="discoverySpin"><span class="roulette-glyph">✦</span><strong>SPIN THE ROULETTE</strong></button>
+          <button type="button" class="discovery-surprise" id="discoverySurprise">Surprise Me</button>
+          <button type="button" class="discovery-clear" id="discoveryClear">Clear filters</button>
+        </div>
+      </div>
+
+      <div id="discoveryResult" class="discovery-result" aria-live="polite">
+        <div class="discovery-waiting">
+          <div class="roulette-orbit"><span>?</span></div>
+          <h2>Ready to discover</h2>
+          <p>All filters are optional.</p>
+        </div>
+      </div>
+    </div>
+  </section>`;
+}
+
+function clearDiscoveryFilters() {
+  const category = $("#discoveryCategory");
+  const rating = $("#discoveryRating");
+  const duration = $("#discoveryDuration");
+  if (category) category.value = "";
+  if (rating) rating.value = "";
+  if (duration) duration.value = "";
+  discoverySelectedGenres.clear();
+  document.querySelectorAll(".discovery-genre-chip").forEach(chip => chip.classList.remove("on"));
+}
+
+function parseDurationMinutes(it) {
+  const raw = firstField(it, ["duration", "runtime", "episodeRuntime", "readTime", "completionTime"]);
+  const dateValue = firstField(it, ["date"]);
+  const pages = Number(firstField(it, ["pages", "pageCount"]));
+  const source = `${raw} ${dateValue}`;
+  let minutes = 0;
+
+  const hourMinute = source.match(/(\d+)\s*h(?:r|rs|ours?)?\s*(?:(\d+)\s*m(?:in|inutes?)?)?/i);
+  const hourOnly = source.match(/(\d+(?:\.\d+)?)\s*(?:hours?|hrs?|h)/i);
+  const minuteOnly = source.match(/(\d+)\s*(?:minutes?|mins?|m)(?!\w)/i);
+
+  if (hourMinute) minutes = Number(hourMinute[1]) * 60 + Number(hourMinute[2] || 0);
+  else if (hourOnly) minutes = Math.round(Number(hourOnly[1]) * 60);
+  else if (minuteOnly) minutes = Number(minuteOnly[1]);
+  else if (Number.isFinite(pages) && pages > 0) minutes = Math.round(pages * 1.5);
+
+  return minutes > 0 ? minutes : null;
+}
+
+function durationMatches(it, duration) {
+  if (!duration) return true;
+  const minutes = parseDurationMinutes(it);
+  if (minutes === null) return true;
+  if (duration === "under30") return minutes < 30;
+  if (duration === "30to60") return minutes >= 30 && minutes <= 60;
+  if (duration === "1to2") return minutes > 60 && minutes <= 120;
+  if (duration === "2to3") return minutes > 120 && minutes <= 180;
+  if (duration === "over3") return minutes > 180;
+  return true;
+}
+
+function itemKey(it) {
+  return `${it.type || "item"}:${it.id}`;
+}
+
+function getDiscoveryEligible(surprise = false) {
+  const category = surprise ? "" : $("#discoveryCategory")?.value || "";
+  const rating = surprise ? "" : $("#discoveryRating")?.value || "";
+  const duration = surprise ? "" : $("#discoveryDuration")?.value || "";
+  const minimumRating = Number(rating);
+
+  return vaultLibrary.filter(it => {
+    if (discoveryExclusions.has(itemKey(it))) return false;
+
+    if (category && String(it.type || "").toLowerCase() !== category.toLowerCase()) return false;
+
+    if (!surprise && discoverySelectedGenres.size) {
+      const itemGenres = (Array.isArray(it.g) ? it.g : [])
+        .flatMap(value => String(value).split(/[\/,&]/))
+        .map(value => value.trim().toLowerCase());
+      const hasGenre = [...discoverySelectedGenres].some(genre => itemGenres.includes(genre.toLowerCase()));
+      if (!hasGenre) return false;
+    }
+
+    if (!surprise && minimumRating && Number(it.rating || 0) < minimumRating) return false;
+    if (!surprise && !durationMatches(it, duration)) return false;
+
+    return true;
+  });
+}
+
+function clearOldestDiscoveryExclusionsForResult(catalogue) {
+  if (!catalogue.length) return;
+  let eligible = catalogue.filter(it => !discoveryExclusions.has(itemKey(it)));
+  while (!eligible.length && discoveryExclusions.size) {
+    let oldestKey = null;
+    let oldestOrder = Infinity;
+    discoveryExclusions.forEach((value, key) => {
+      if (value.order < oldestOrder) {
+        oldestOrder = value.order;
+        oldestKey = key;
+      }
+    });
+    if (oldestKey) discoveryExclusions.delete(oldestKey);
+    eligible = catalogue.filter(it => !discoveryExclusions.has(itemKey(it)));
+  }
+}
+
+function countSuccessfulDiscoverySpin() {
+  const expired = [];
+  discoveryExclusions.forEach((value, key) => {
+    value.remaining -= 1;
+    if (value.remaining <= 0) expired.push(key);
+  });
+  expired.forEach(key => discoveryExclusions.delete(key));
+}
+
+function discoveryResultMarkup(it) {
+  const k = itemKey(it);
+  const genres = Array.isArray(it.g) ? it.g.join(" · ") : "";
+  const image = it.back || it.poster || "";
+  const metadata = showcaseMetadata(it);
+  const category = categoryLabel(it.type);
+
+  return `<article class="discovery-result-card">
+    <div class="discovery-result-image">
+      ${image ? `<img src="${esc(image)}" alt="${esc(it.title)}">` : `<div class="discovery-result-placeholder">${esc(category)}</div>`}
+      <span class="discovery-result-category">${esc(category)}</span>
+    </div>
+    <div class="discovery-result-copy">
+      <span class="discovery-result-kicker">YOUR DISCOVERY</span>
+      <h2>${esc(it.title)}</h2>
+      ${it.creator ? `<p class="discovery-result-creator">${esc(it.creator)}</p>` : ""}
+      <div class="discovery-result-meta">
+        ${metadata.map(value => `<span>${esc(value)}</span>`).join("")}
+        ${it.rating ? `<span>★ ${Number(it.rating).toFixed(1)}</span>` : ""}
+      </div>
+      ${genres ? `<p class="discovery-result-genres">${esc(genres)}</p>` : ""}
+      <p class="discovery-result-description">${esc(it.ov || "No description available.")}</p>
+      <div class="discovery-result-actions">
+        <button type="button" class="discovery-result-primary" data-open="${k}">View Details</button>
+        <button type="button" class="discovery-result-secondary" id="discoveryTryAgain">Try Again</button>
+        <button type="button" class="discovery-not-interested" data-not-interested="${k}">Not Interested</button>
+      </div>
+    </div>
+  </article>`;
+}
+
+function spinDiscovery(surprise = false) {
+  discoverySurpriseMode = surprise;
+  clearTimeout(discoverySpinTimer);
+
+  let eligible = getDiscoveryEligible(surprise);
+  if (surprise) clearOldestDiscoveryExclusionsForResult(vaultLibrary);
+  eligible = getDiscoveryEligible(true);
+
+  if (!surprise && !eligible.length) {
+    $("#discoveryResult").innerHTML = `<div class="discovery-empty">
+      <div class="discovery-empty-icon">×</div>
+      <h2>No discoveries found</h2>
+      <p>Try relaxing your filters or clear them for a wider search.</p>
+      <button type="button" class="discovery-result-primary" id="discoveryClearEmpty">Clear filters</button>
+    </div>`;
+    return;
+  }
+
+  if (surprise) {
+    eligible = getDiscoveryEligible(true);
+  }
+
+  if (!eligible.length) {
+    $("#discoveryResult").innerHTML = `<div class="discovery-empty"><h2>No discoveries found</h2><p>The catalogue is currently empty.</p></div>`;
+    return;
+  }
+
+  let choices = eligible;
+  if (eligible.length > 1) {
+    choices = eligible.filter(it => itemKey(it) !== discoveryLastKey);
+    if (!choices.length) choices = eligible;
+  }
+
+  $("#discoveryResult").innerHTML = `<div class="discovery-spinning">
+    <div class="roulette-wheel"><div class="roulette-wheel-ring"><span>✦</span></div></div>
+    <h2>Finding your discovery...</h2>
+  </div>`;
+
+  let frames = 0;
+  const wheelItems = eligible;
+  const spinVisual = setInterval(() => {
+    const preview = wheelItems[Math.floor(Math.random() * wheelItems.length)];
+    const previewNode = $(".discovery-spinning h2");
+    if (previewNode) previewNode.textContent = preview.title;
+    frames++;
+  }, 90);
+
+  discoverySpinTimer = setTimeout(() => {
+    clearInterval(spinVisual);
+    const selected = choices[Math.floor(Math.random() * choices.length)];
+    const key = itemKey(selected);
+    discoveryLastKey = key;
+    countSuccessfulDiscoverySpin();
+    $("#discoveryResult").innerHTML = discoveryResultMarkup(selected);
+  }, 1500);
+}
+
+function markDiscoveryNotInterested(k) {
+  if (discoveryExclusions.has(k)) return;
+  discoveryExclusions.set(k, { remaining: 15, order: ++discoveryExclusionOrder });
+  const button = document.querySelector(`[data-not-interested="${CSS.escape(k)}"]`);
+  if (button) {
+    button.textContent = "Excluded for 15 spins";
+    button.disabled = true;
+  }
+  showToast("Temporarily excluded for the next 15 spins");
 }
