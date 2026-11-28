@@ -695,8 +695,15 @@ function drawTopTen(resetTimer = false) {
     ${rightItems.length ? `<div class="top10-rail top10-rail-right" aria-label="Ranks after the featured item">${rightItems.map((item, i) => posterCard(item, showcaseIndex + i + 1)).join("")}</div>` : ""}
   </div>`;
 
-  h.onmouseenter = () => { showcasePaused = true; };
-  h.onmouseleave = () => { showcasePaused = false; startShowcaseTimer(true); };
+  h.onmouseenter = () => {
+    showcasePaused = true;
+    clearTimeout(showcaseTimer);
+    showcaseTimer = null;
+  };
+  h.onmouseleave = () => {
+    showcasePaused = false;
+    startShowcaseTimer(true);
+  };
   $("#amb").style.backgroundImage = bgImg ? `url(${esc(bgImg)})` : "";
 
   if (resetTimer) startShowcaseTimer(true);
